@@ -1,67 +1,68 @@
 package studio.trc.bukkit.litesignin.event.custom;
 
-import java.util.Date;
-
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-
-import studio.trc.bukkit.litesignin.util.SignInDate;
 import studio.trc.bukkit.litesignin.gui.SignInInventory;
+import studio.trc.bukkit.litesignin.util.SignInDate;
+
+import java.util.Date;
 
 public class SignInGUIOpenEvent
-    extends Event
-    implements Cancellable
-{
+        extends Event
+        implements Cancellable {
     public static HandlerList handlers = new HandlerList();
-    
+
     private final SignInDate time = SignInDate.getInstance(new Date());
+    private final Player player;
+    private final SignInInventory inventory;
     private boolean cancelled = false;
     private int month = time.getMonth();
     private int year = time.getYear();
-    
-    private final Player player;
-    private final SignInInventory inventory;
-    
+
     public SignInGUIOpenEvent(Player player, SignInInventory inventory) {
         this.player = player;
         this.inventory = inventory;
     }
-    
+
     public SignInGUIOpenEvent(Player player, SignInInventory inventory, int month) {
         this.player = player;
         this.inventory = inventory;
         this.month = month;
     }
-    
+
     public SignInGUIOpenEvent(Player player, SignInInventory inventory, int month, int year) {
         this.player = player;
         this.inventory = inventory;
         this.month = month;
         this.year = year;
     }
-    
+
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
     public Player getPlayer() {
         return player;
     }
-    
+
     public SignInInventory getInventory() {
         return inventory;
     }
-    
+
     public SignInDate getTime() {
         return time;
     }
-    
+
     public int getMonth() {
         return month;
     }
-    
+
     public int getYear() {
         return year;
     }
-    
+
     @Override
     public HandlerList getHandlers() {
         return handlers;
@@ -75,9 +76,5 @@ public class SignInGUIOpenEvent
     @Override
     public void setCancelled(boolean b) {
         cancelled = b;
-    }
-    
-    public static HandlerList getHandlerList() {
-        return handlers;
     }
 }

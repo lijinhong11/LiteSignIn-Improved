@@ -1,46 +1,23 @@
 package studio.trc.bukkit.litesignin.message.color;
 
-import java.awt.Color;
-import java.util.List;
-
 import lombok.Getter;
-
 import net.md_5.bungee.api.ChatColor;
-
 import studio.trc.bukkit.litesignin.message.tag.TagContentExtractor;
 import studio.trc.bukkit.litesignin.message.tag.TagContentInfo;
 import studio.trc.bukkit.litesignin.util.LiteSignInUtils;
 
-public class TransitionColor 
-    implements FunctionalColor
-{
+import java.awt.*;
+import java.util.List;
+
+public class TransitionColor
+        implements FunctionalColor {
     @Getter
     private static final TransitionColor instance = new TransitionColor();
-    
-    @Override
-    public String coloring(String content) {
-        String original = content;
-        List<TagContentInfo> colorTags = TagContentExtractor.getTagContentsInfo(content, "transition");
-        for (TagContentInfo tagContent : colorTags) {
-            if (tagContent.getAttribute() == null) continue;
-            String[] colorList = tagContent.getAttribute().split(":", -1);
-            String text = tagContent.getContent();
-            if (colorList.length >= 2 && LiteSignInUtils.isFloat(colorList[colorList.length - 1])) {
-                float ratio = Float.valueOf(colorList[colorList.length - 1]);
-                String[] colors = new String[colorList.length - 1];
-                for (int i = 0;i < colorList.length - 1;i++) {
-                    colors[i] = colorList[i];
-                }
-                content = tagContent.replace(content, (tagContent.getCloseTag() != null ? "<previousColor>" : "") + makeTransition(colors, ratio) + ColorUtils.getPreviousTypeface(original, tagContent.getStartPosition()) + text + (tagContent.getCloseTag() != null ? "</previousColor>" : ""));
-            }
-        }
-        return content;
-    }
-    
+
     /**
      * @param containsColors Color list
-     * @param ratio The ratio range in [0, 1]
-     * @return 
+     * @param ratio          The ratio range in [0, 1]
+     * @return
      */
     public static ChatColor makeTransition(String[] containsColors, float ratio) {
         if (containsColors.length == 0) return ChatColor.getByChar('r');
@@ -56,9 +33,9 @@ public class TransitionColor
             Color c1 = ColorUtils.getColor(containsColors[index]);
             Color c2 = ColorUtils.getColor(containsColors[index + 1]);
             color = new Color(
-                (int) (c1.getRed() + localRatio * (c2.getRed() - c1.getRed())),
-                (int) (c1.getGreen() + localRatio * (c2.getGreen() - c1.getGreen())),
-                (int) (c1.getBlue() + localRatio * (c2.getBlue() - c1.getBlue()))
+                    (int) (c1.getRed() + localRatio * (c2.getRed() - c1.getRed())),
+                    (int) (c1.getGreen() + localRatio * (c2.getGreen() - c1.getGreen())),
+                    (int) (c1.getBlue() + localRatio * (c2.getBlue() - c1.getBlue()))
             );
         }
         if (ColorUtils.isSupportsRGBVersions()) {
@@ -66,5 +43,23 @@ public class TransitionColor
         } else {
             return ChatColor.getByChar(ColorUtils.toNearestColor(color));
         }
+    }
+
+    @Override
+    public String coloring(String content) {
+        String original = content;
+        List<TagContentInfo> colorTags = TagContentExtractor.getTagContentsInfo(content, "transition");
+        for (TagContentInfo tagContent : colorTags) {
+            if (tagContent.getAttribute() == null) continue;
+            String[] colorList = tagContent.getAttribute().split(":", -1);
+            String text = tagContent.getContent();
+            if (colorList.length >= 2 && LiteSignInUtils.isFloat(colorList[colorList.length - 1])) {
+                float ratio = Float.valueOf(colorList[colorList.length - 1]);
+                String[] colors = new String[colorList.length - 1];
+                System.arraycopy(colorList, 0, colors, 0, colorList.length - 1);
+                content = tagContent.replace(content, (tagContent.getCloseTag() != null ? "<previousColor>" : "") + makeTransition(colors, ratio) + ColorUtils.getPreviousTypeface(original, tagContent.getStartPosition()) + text + (tagContent.getCloseTag() != null ? "</previousColor>" : ""));
+            }
+        }
+        return content;
     }
 }

@@ -1,29 +1,26 @@
 package studio.trc.bukkit.litesignin.reward.type;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.Getter;
-
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
-import studio.trc.bukkit.litesignin.reward.util.SignInGroup;
+import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
 import studio.trc.bukkit.litesignin.reward.SignInRewardColumn;
 import studio.trc.bukkit.litesignin.reward.SignInRewardModule;
 import studio.trc.bukkit.litesignin.reward.command.SignInRewardCommand;
+import studio.trc.bukkit.litesignin.reward.util.SignInGroup;
 import studio.trc.bukkit.litesignin.reward.util.SignInSound;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SignInSpecialRankingReward
-    extends SignInRewardColumn
-{
+        extends SignInRewardColumn {
     @Getter
     private final SignInGroup group;
     @Getter
     private final int ranking;
-    
+
     public SignInSpecialRankingReward(SignInGroup group, int ranking) {
         this.group = group;
         this.ranking = ranking;
@@ -33,7 +30,7 @@ public class SignInSpecialRankingReward
     public SignInRewardModule getModule() {
         return SignInRewardModule.SPECIAL_RANKING;
     }
-    
+
     @Override
     public boolean overrideDefaultRewards() {
         if (ConfigurationUtil.getConfig(ConfigurationType.REWARD_SETTINGS).contains("Reward-Settings.Permission-Groups." + group.getGroupName() + ".Special-Ranking." + ranking + ".Override-default-rewards")) {
@@ -69,7 +66,7 @@ public class SignInSpecialRankingReward
     }
 
     @Override
-    public List<SignInSound> getSounds() { 
+    public List<SignInSound> getSounds() {
         return super.getSounds("Reward-Settings.Permission-Groups." + group.getGroupName() + ".Special-Ranking." + ranking + ".Play-Sounds");
     }
 }

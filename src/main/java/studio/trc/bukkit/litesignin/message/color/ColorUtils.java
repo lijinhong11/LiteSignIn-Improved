@@ -1,26 +1,23 @@
 package studio.trc.bukkit.litesignin.message.color;
 
-import java.awt.Color;
+import lombok.Getter;
+import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
+import studio.trc.bukkit.litesignin.message.tag.TagContentExtractor;
+import studio.trc.bukkit.litesignin.message.tag.TagContentInfo;
+
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import lombok.Getter;
-
-import net.md_5.bungee.api.ChatColor;
-
-import org.bukkit.Bukkit;
-
-import studio.trc.bukkit.litesignin.message.tag.TagContentExtractor;
-import studio.trc.bukkit.litesignin.message.tag.TagContentInfo;
-
 /**
  * Text coloring & "Pseudo MiniMessage" processing
+ *
  * @author Mercy
  */
-public class ColorUtils 
-{
+public class ColorUtils {
     @Getter
     private static final Map<Color, Character> colorRGBValues = new HashMap<>();
     @Getter
@@ -31,7 +28,7 @@ public class ColorUtils
     private static final Map<String, String> typefaceNames = new HashMap<>();
     @Getter
     private static final List<FunctionalColor> colors = new ArrayList<>();
-    
+
     static {
         colorRGBValues.put(new Color(0), '0');
         colorRGBValues.put(new Color(170), '1');
@@ -89,9 +86,10 @@ public class ColorUtils
         colors.add(GradientColor.getInstance());
         colors.add(TransitionColor.getInstance());
     }
-    
+
     /**
      * Get the closest classic color to it
+     *
      * @param color java.awt.Color instance
      * @return Hex color -> Classic color
      */
@@ -110,9 +108,10 @@ public class ColorUtils
         }
         return result;
     }
-    
+
     /**
      * Get the closest classic color to it
+     *
      * @param hexadecimalColor String color
      * @return Hex color -> Classic color
      */
@@ -122,28 +121,30 @@ public class ColorUtils
         }
         return 'r';
     }
-    
+
     /**
      * 1.15 below: Classic color
      * 1.16 above: Hex color & classic color
-     * @return 
+     *
+     * @return
      */
     public static boolean isSupportsRGBVersions() {
         return !Bukkit.getBukkitVersion().startsWith("1.7") && !Bukkit.getBukkitVersion().startsWith("1.8") && !Bukkit.getBukkitVersion().startsWith("1.9") && !Bukkit.getBukkitVersion().startsWith("1.10") &&
                 !Bukkit.getBukkitVersion().startsWith("1.11") && !Bukkit.getBukkitVersion().startsWith("1.12") && !Bukkit.getBukkitVersion().startsWith("1.13") && !Bukkit.getBukkitVersion().startsWith("1.14") && !Bukkit.getBukkitVersion().startsWith("1.15");
     }
-    
+
     /**
      * Coloring of text
+     *
      * @param text
-     * @return 
+     * @return
      */
     public static String toColor(String text) {
         if (text == null) return null;
         try {
             //Preliminary coloring
             String content = ChatColor.translateAlternateColorCodes('&', text);
-            
+
             //Functional coloring (Tag identification)
             for (FunctionalColor function : colors) content = function.coloring(content);
             TagContentInfo previousColor;
@@ -152,7 +153,7 @@ public class ColorUtils
                 content = previousColor.replace(content, previousColor.getContent() + ColorUtils.getPreviousColorAndTypeface(content, previousColor.getStartPosition()));
                 if (content.equals(originalText)) break;
             }
-            
+
             //Hexadecimal coloring
             List<String> hexadecimalColors = getHexadecimalColors(content);
             for (String color : hexadecimalColors) {
@@ -167,10 +168,11 @@ public class ColorUtils
 
     /**
      * Retrieve the contents of the color array and independently color each character of the string.
-     * @param text Text
-     * @param colors Color array
+     *
+     * @param text             Text
+     * @param colors           Color array
      * @param previousTypeface Previous typeface of text
-     * @return 
+     * @return
      */
     public static String coloring(String text, ChatColor[] colors, String previousTypeface) {
         if (text == null || text.isEmpty()) return text;
@@ -182,8 +184,8 @@ public class ColorUtils
                 if (characters[charIndex + 1].equalsIgnoreCase("r")) {
                     colorName = "";
                 } else {
-                    colorName+=characters[charIndex];
-                    colorName+=characters[charIndex + 1];
+                    colorName += characters[charIndex];
+                    colorName += characters[charIndex + 1];
                 }
                 charIndex++;
             } else {
@@ -192,12 +194,13 @@ public class ColorUtils
         }
         return builder.toString();
     }
-    
+
     /**
      * Get the most recent color and typeface before this content
+     *
      * @param content Text
-     * @param start Start index
-     * @return 
+     * @param start   Start index
+     * @return
      */
     public static String getPreviousColorAndTypeface(String content, int start) {
         String colorName = "§r";
@@ -211,12 +214,13 @@ public class ColorUtils
         }
         return colorName;
     }
-    
+
     /**
      * Get the most recent typeface before this content
+     *
      * @param content Text
-     * @param start Start index
-     * @return 
+     * @param start   Start index
+     * @return
      */
     public static String getPreviousTypeface(String content, int start) {
         String typefaceName = "";
@@ -230,11 +234,12 @@ public class ColorUtils
         }
         return typefaceName;
     }
-    
+
     /**
      * String -> Color
+     *
      * @param colorName
-     * @return 
+     * @return
      */
     public static Color getColor(String colorName) {
         if (colorNames.containsKey(colorName.toLowerCase())) {
@@ -245,7 +250,7 @@ public class ColorUtils
             return colorRGBValues.keySet().stream().filter(color -> colorRGBValues.get(color).toString().equals(colorName.replace("&", "").replace("§", ""))).findFirst().orElse(new Color(16777215));
         }
     }
-    
+
     private static List<String> getHexadecimalColors(String text) {
         List<String> hexadecimalColors = new ArrayList<>();
         if (text == null || text.length() < 7) {
@@ -262,7 +267,7 @@ public class ColorUtils
         }
         return hexadecimalColors;
     }
-    
+
     private static List<String> getColorSymbols(String text) {
         List<String> result = new ArrayList<>();
         if (text == null || text.length() < 2) {
@@ -279,7 +284,7 @@ public class ColorUtils
         }
         return result;
     }
-    
+
     private static List<String> getTypefaceSymbols(String text) {
         List<String> result = new ArrayList<>();
         if (text == null || text.length() < 2) {
@@ -296,38 +301,38 @@ public class ColorUtils
         }
         return result;
     }
-    
+
     private static List<String> getColorAndTypefaceSymbols(String text) {
         List<String> result = new ArrayList<>();
         result.addAll(getColorSymbols(text));
         result.addAll(getTypefaceSymbols(text));
         return result;
     }
-    
+
     private static boolean isHexadecimalSequence(String text, int start, int length) {
         if (start + length > text.length()) {
             return false;
         }
         for (int i = start; i < start + length; i++) {
             char c = text.charAt(i);
-            if (!((c >= '0' && c <= '9') || 
-                  (c >= 'a' && c <= 'f') || 
-                  (c >= 'A' && c <= 'F'))) {
+            if (!((c >= '0' && c <= '9') ||
+                    (c >= 'a' && c <= 'f') ||
+                    (c >= 'A' && c <= 'F'))) {
                 return false;
             }
         }
         return true;
     }
-    
+
     private static boolean isColorSymbol(String text, int index) {
         char c = Character.toLowerCase(text.charAt(index));
         return ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || c == 'r');
     }
-    
+
     private static boolean isTypefaceSymbol(String text, int index) {
         char c = Character.toLowerCase(text.charAt(index));
         return c == 'l' || c == 'o' ||
-            c == 'n' || c == 'm' ||
-            c == 'k';
+                c == 'n' || c == 'm' ||
+                c == 'k';
     }
 }

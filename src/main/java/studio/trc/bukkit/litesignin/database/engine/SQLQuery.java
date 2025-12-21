@@ -1,14 +1,13 @@
 package studio.trc.bukkit.litesignin.database.engine;
 
+import lombok.Getter;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import lombok.Getter;
-
 public class SQLQuery
-    implements AutoCloseable
-{
+        implements AutoCloseable {
     @Getter
     private final ResultSet result;
     @Getter

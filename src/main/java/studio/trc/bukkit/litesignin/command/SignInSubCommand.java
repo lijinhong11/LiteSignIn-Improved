@@ -1,48 +1,51 @@
 package studio.trc.bukkit.litesignin.command;
 
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-
-public interface SignInSubCommand
-{
+public interface SignInSubCommand {
     /**
      * Execute sub command.
-     * @param sender Command sender.
+     *
+     * @param sender     Command sender.
      * @param subCommand The sub command.
-     * @param args arguments.
+     * @param args       arguments.
      */
-    public void execute(CommandSender sender, String subCommand, String... args);
-    
+    void execute(CommandSender sender, String subCommand, String... args);
+
     /**
      * Sub command's name.
-     * @return 
+     *
+     * @return
      */
-    public String getName();
-    
+    String getName();
+
     /**
      * Tab complete.
-     * @param sender Command sender.
+     *
+     * @param sender     Command sender.
      * @param subCommand The sub command.
-     * @param args arguments.
-     * @return 
+     * @param args       arguments.
+     * @return
      */
-    public List<String> tabComplete(CommandSender sender, String subCommand, String... args);
-    
+    List<String> tabComplete(CommandSender sender, String subCommand, String... args);
+
     /**
      * Sub command type.
-     * @return 
+     *
+     * @return
      */
-    public SignInSubCommandType getCommandType();
-    
+    SignInSubCommandType getCommandType();
+
     /**
-     * @param args arguments.
+     * @param args   arguments.
      * @param length
-     * @return 
+     * @return
      */
     default List<String> tabGetPlayersName(String[] args, int length) {
         if (args.length == length) {
@@ -55,12 +58,12 @@ public interface SignInSubCommand
         }
         return new ArrayList<>();
     }
-    
+
     /**
      * @param args
      * @param length
      * @param elements
-     * @return 
+     * @return
      */
     default List<String> getTabElements(String[] args, int length, Collection<String> elements) {
         if (args.length == length) {

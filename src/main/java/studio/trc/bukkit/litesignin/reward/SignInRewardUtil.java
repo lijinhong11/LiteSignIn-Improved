@@ -1,9 +1,5 @@
 package studio.trc.bukkit.litesignin.reward;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -11,23 +7,25 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
 import studio.trc.bukkit.litesignin.api.Storage;
-import studio.trc.bukkit.litesignin.configuration.RobustConfiguration;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
+import studio.trc.bukkit.litesignin.configuration.RobustConfiguration;
 import studio.trc.bukkit.litesignin.message.MessageUtil;
 import studio.trc.bukkit.litesignin.message.color.ColorUtils;
 import studio.trc.bukkit.litesignin.queue.SignInQueue;
 import studio.trc.bukkit.litesignin.reward.command.SignInRewardCommand;
 import studio.trc.bukkit.litesignin.reward.command.SignInRewardCommandType;
 import studio.trc.bukkit.litesignin.reward.util.SignInSound;
-import studio.trc.bukkit.litesignin.util.PluginControl;
 import studio.trc.bukkit.litesignin.util.LiteSignInProperties;
+import studio.trc.bukkit.litesignin.util.PluginControl;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public abstract class SignInRewardUtil
-    implements SignInReward
-{
+        implements SignInReward {
     @Override
     public void giveReward(Storage playerData) {
         String queue = String.valueOf(SignInQueue.getInstance().getRank(playerData.getUserUUID()));
@@ -85,7 +83,7 @@ public abstract class SignInRewardUtil
             }
         }
     }
-    
+
     public List<ItemStack> getRewardItems(Player player, String configPath) {
         List<ItemStack> list = new ArrayList<>();
         RobustConfiguration config = ConfigurationUtil.getConfig(ConfigurationType.REWARD_SETTINGS);
@@ -94,7 +92,7 @@ public abstract class SignInRewardUtil
         }
         return list;
     }
-    
+
     public List<SignInRewardCommand> getCommands(String configPath) {
         List<SignInRewardCommand> list = new ArrayList<>();
         if (ConfigurationUtil.getConfig(ConfigurationType.REWARD_SETTINGS).contains(configPath)) {
@@ -110,7 +108,7 @@ public abstract class SignInRewardUtil
         }
         return list;
     }
-    
+
     public ItemStack getItemFromItemData(Player player, String item) {
         String[] itemdata = item.split(":");
         try {
@@ -121,7 +119,8 @@ public abstract class SignInRewardUtil
                 } else {
                     is.setAmount(Integer.valueOf(itemdata[1]));
                 }
-            } catch (NumberFormatException ex) {}
+            } catch (NumberFormatException ex) {
+            }
             return is;
         } catch (IllegalArgumentException e) {
             RobustConfiguration config = ConfigurationUtil.getConfig(ConfigurationType.CUSTOM_ITEMS);
@@ -150,8 +149,10 @@ public abstract class SignInRewardUtil
                 if (config.contains("Manual-Settings." + itemdata[0] + ".Enchantment")) {
                     setEnchantments("Manual-Settings." + itemdata[0] + ".Enchantment", im);
                 }
-                if (config.get("Manual-Settings." + itemdata[0] + ".Hide-Enchants") != null) PluginControl.hideEnchants(im);
-                if (config.contains("Manual-Settings." + itemdata[0] + ".Display-Name")) im.setDisplayName(ColorUtils.toColor(MessageUtil.toPlaceholderAPIResult(player, config.getString("Manual-Settings." + itemdata[0] + ".Display-Name"))));
+                if (config.get("Manual-Settings." + itemdata[0] + ".Hide-Enchants") != null)
+                    PluginControl.hideEnchants(im);
+                if (config.contains("Manual-Settings." + itemdata[0] + ".Display-Name"))
+                    im.setDisplayName(ColorUtils.toColor(MessageUtil.toPlaceholderAPIResult(player, config.getString("Manual-Settings." + itemdata[0] + ".Display-Name"))));
                 is.setItemMeta(im);
                 try {
                     if (itemdata[1].contains("-")) {
@@ -181,7 +182,7 @@ public abstract class SignInRewardUtil
         }
         return null;
     }
-    
+
     public List<SignInSound> getSounds(String configPath) {
         List<SignInSound> sounds = new ArrayList<>();
         RobustConfiguration config = ConfigurationUtil.getConfig(ConfigurationType.REWARD_SETTINGS);
@@ -204,11 +205,11 @@ public abstract class SignInRewardUtil
                     placeholders.put("{path}", configPath + "." + value);
                     LiteSignInProperties.sendOperationMessage("InvalidSoundSetting", placeholders);
                 }
-            }); 
+            });
         }
         return sounds;
     }
-    
+
     private void setEnchantments(String configPath, ItemMeta im) {
         for (String name : ConfigurationUtil.getConfig(ConfigurationType.CUSTOM_ITEMS).getStringList(configPath)) {
             try {

@@ -1,31 +1,24 @@
 package studio.trc.bukkit.litesignin.command;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import lombok.Getter;
-
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-
 import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
-import studio.trc.bukkit.litesignin.message.MessageUtil;
 import studio.trc.bukkit.litesignin.database.util.BackupUtil;
 import studio.trc.bukkit.litesignin.database.util.RollBackUtil;
-import studio.trc.bukkit.litesignin.util.PluginControl;
+import studio.trc.bukkit.litesignin.message.MessageUtil;
 import studio.trc.bukkit.litesignin.util.LiteSignInUtils;
+import studio.trc.bukkit.litesignin.util.PluginControl;
 import studio.trc.bukkit.litesignin.util.Updater;
 
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 public class SignInCommand
-    implements CommandExecutor, TabCompleter
-{
+        implements CommandExecutor, TabCompleter {
     @Getter
     private static final Map<String, SignInSubCommand> subCommands = new HashMap();
 
@@ -58,7 +51,7 @@ public class SignInCommand
             return new ArrayList<>();
         }
     }
-    
+
     private void callSubCommand(CommandSender sender, String[] args) {
         String subCommand = args[0].toLowerCase();
         if (subCommands.get(subCommand) == null) {
@@ -66,9 +59,10 @@ public class SignInCommand
             return;
         }
         SignInSubCommand command = subCommands.get(subCommand);
-        if (LiteSignInUtils.hasCommandPermission(sender, command.getCommandType().getCommandPermissionPath(), true)) command.execute(sender, subCommand, args);
+        if (LiteSignInUtils.hasCommandPermission(sender, command.getCommandType().getCommandPermissionPath(), true))
+            command.execute(sender, subCommand, args);
     }
-    
+
     private void checkUpdate() {
         if (PluginControl.enableUpdater()) {
             String now = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
@@ -78,7 +72,7 @@ public class SignInCommand
             }
         }
     }
-    
+
     private List<String> getCommands(CommandSender sender) {
         List<String> commands = new ArrayList<>();
         subCommands.values().stream().filter(command -> LiteSignInUtils.hasCommandPermission(sender, command.getCommandType().getCommandPermissionPath(), false)).forEach(command -> {
@@ -86,7 +80,7 @@ public class SignInCommand
         });
         return commands;
     }
-    
+
     private List<String> getNormallyTabComplete(CommandSender sender, String args) {
         List<String> commands = getCommands(sender);
         if (args != null) {
@@ -98,7 +92,7 @@ public class SignInCommand
         }
         return commands;
     }
-    
+
     private List<String> tabComplete(CommandSender sender, String[] args) {
         String subCommand = args[0].toLowerCase();
         if (subCommands.get(subCommand) == null) {

@@ -1,35 +1,28 @@
 package studio.trc.bukkit.litesignin.command.subcommand;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import lombok.Getter;
-
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
 import studio.trc.bukkit.litesignin.api.Storage;
 import studio.trc.bukkit.litesignin.command.SignInSubCommand;
 import studio.trc.bukkit.litesignin.command.SignInSubCommandType;
-import studio.trc.bukkit.litesignin.configuration.RobustConfiguration;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
+import studio.trc.bukkit.litesignin.configuration.RobustConfiguration;
 import studio.trc.bukkit.litesignin.message.MessageUtil;
 import studio.trc.bukkit.litesignin.reward.SignInReward;
 import studio.trc.bukkit.litesignin.reward.type.*;
 import studio.trc.bukkit.litesignin.reward.util.SignInGroup;
 import studio.trc.bukkit.litesignin.reward.util.SignInTimePeriod;
-import studio.trc.bukkit.litesignin.util.SignInDate;
 import studio.trc.bukkit.litesignin.util.LiteSignInUtils;
+import studio.trc.bukkit.litesignin.util.SignInDate;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class RewardCommand
-    implements SignInSubCommand
-{
+        implements SignInSubCommand {
     @Override
     public void execute(CommandSender sender, String subCommand, String... args) {
         Map<String, String> placeholders = MessageUtil.getDefaultPlaceholders();
@@ -428,72 +421,72 @@ public class RewardCommand
     public SignInSubCommandType getCommandType() {
         return SignInSubCommandType.REWARD;
     }
-    
+
     public enum RewardType {
         /**
          * Normal time
          */
         NORMAL_TIME("Normal-Time"),
-        
+
         /**
          * Retroactive time
          */
         RETROACTIVE_TIME("Retroactive-Time"),
-        
+
         /**
          * Special times
          */
         SPECIAL_TIMES("Special-Times"),
-        
+
         /**
          * Special weeks
          */
         SPECIAL_WEEKS("Special-Weeks"),
-        
+
         /**
          * Special dates
          */
         SPECIAL_DATES("Special-Dates"),
-        
+
         /**
          * Special ranking
          */
         SPECIAL_RANKING("Special-Ranking"),
-        
+
         /**
          * Special time periods
          */
         SPECIAL_TIME_PERIODS("Special-Time-periods"),
-        
+
         /**
          * Statistics
          */
         STATISTICS("Statistics-Times"),
-        
+
         /**
          * Special times of month
          */
         SPECIAL_TIMES_OF_MONTH("Special-Times-Of-Month"),
-        
+
         /**
          * Statistics of month
          */
         STATISTICS_OF_MONTH("Statistics-Times-Of-Month"),
-        
+
         /**
          * Special time cycle
          */
         SPECIAL_TIME_CYCLE("Special-Times-Cycle"),
-        
+
         /**
          * Statistics cycle
          */
         STATISTICS_CYCLE("Statistics-Times-Cycle");
-        
+
         @Getter
         private final String configName;
-        
-        private RewardType(String configName) {
+
+        RewardType(String configName) {
             this.configName = configName;
         }
     }

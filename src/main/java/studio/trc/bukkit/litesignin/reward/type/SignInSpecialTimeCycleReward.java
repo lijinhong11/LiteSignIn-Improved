@@ -1,15 +1,11 @@
 package studio.trc.bukkit.litesignin.reward.type;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.Getter;
-
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import studio.trc.bukkit.litesignin.configuration.RobustConfiguration;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
+import studio.trc.bukkit.litesignin.configuration.RobustConfiguration;
 import studio.trc.bukkit.litesignin.reward.SignInRewardColumn;
 import studio.trc.bukkit.litesignin.reward.SignInRewardModule;
 import studio.trc.bukkit.litesignin.reward.command.SignInRewardCommand;
@@ -17,16 +13,18 @@ import studio.trc.bukkit.litesignin.reward.util.SignInGroup;
 import studio.trc.bukkit.litesignin.reward.util.SignInSound;
 import studio.trc.bukkit.litesignin.util.LiteSignInUtils;
 
-public class SignInSpecialTimeCycleReward 
-    extends SignInRewardColumn
-{
+import java.util.ArrayList;
+import java.util.List;
+
+public class SignInSpecialTimeCycleReward
+        extends SignInRewardColumn {
     @Getter
     private final SignInGroup group;
     @Getter
     private final int time;
     @Getter
     private final String setting;
-    
+
     public SignInSpecialTimeCycleReward(SignInGroup group, int time) {
         this.group = group;
         this.time = time;
@@ -37,7 +35,7 @@ public class SignInSpecialTimeCycleReward
     public SignInRewardModule getModule() {
         return SignInRewardModule.STATISTICS_TIME_CYCLE;
     }
-    
+
     @Override
     public boolean overrideDefaultRewards() {
         if (ConfigurationUtil.getConfig(ConfigurationType.REWARD_SETTINGS).contains("Reward-Settings.Permission-Groups." + group.getGroupName() + ".Special-Times-Cycle." + setting + ".Override-default-rewards")) {
@@ -45,7 +43,7 @@ public class SignInSpecialTimeCycleReward
         }
         return false;
     }
-    
+
     @Override
     public List<String> getMessages() {
         if (ConfigurationUtil.getConfig(ConfigurationType.REWARD_SETTINGS).contains("Reward-Settings.Permission-Groups." + group.getGroupName() + ".Special-Times-Cycle." + setting + ".Messages")) {
@@ -76,7 +74,7 @@ public class SignInSpecialTimeCycleReward
     public List<SignInSound> getSounds() {
         return super.getSounds("Reward-Settings.Permission-Groups." + group.getGroupName() + ".Special-Times-Cycle." + setting + ".Play-Sounds");
     }
-    
+
     private String getSettingPath() {
         RobustConfiguration config = ConfigurationUtil.getConfig(ConfigurationType.REWARD_SETTINGS);
         if (config.contains("Reward-Settings.Permission-Groups." + group.getGroupName() + ".Special-Times-Cycle")) {

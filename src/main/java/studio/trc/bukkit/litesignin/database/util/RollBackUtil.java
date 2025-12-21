@@ -1,5 +1,23 @@
 package studio.trc.bukkit.litesignin.database.util;
 
+import lombok.Getter;
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
+import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
+import studio.trc.bukkit.litesignin.database.DatabaseTable;
+import studio.trc.bukkit.litesignin.database.engine.MySQLEngine;
+import studio.trc.bukkit.litesignin.database.engine.SQLiteEngine;
+import studio.trc.bukkit.litesignin.database.storage.MySQLStorage;
+import studio.trc.bukkit.litesignin.database.storage.SQLiteStorage;
+import studio.trc.bukkit.litesignin.database.storage.YamlStorage;
+import studio.trc.bukkit.litesignin.event.Menu;
+import studio.trc.bukkit.litesignin.message.MessageUtil;
+import studio.trc.bukkit.litesignin.util.PluginControl;
+
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,57 +26,37 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import lombok.Getter;
-
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
-
-import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
-import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
-import studio.trc.bukkit.litesignin.database.DatabaseTable;
-import studio.trc.bukkit.litesignin.message.MessageUtil;
-import studio.trc.bukkit.litesignin.database.storage.MySQLStorage;
-import studio.trc.bukkit.litesignin.database.storage.SQLiteStorage;
-import studio.trc.bukkit.litesignin.database.storage.YamlStorage;
-import studio.trc.bukkit.litesignin.database.engine.MySQLEngine;
-import studio.trc.bukkit.litesignin.database.engine.SQLiteEngine;
-import studio.trc.bukkit.litesignin.event.Menu;
-import studio.trc.bukkit.litesignin.util.PluginControl;
-
-public class RollBackUtil
-{
+public class RollBackUtil {
     @Getter
     private static boolean rollingback = false;
-    
+
     /**
      * Start rollback method.
+     *
      * @param rollBackFile Target backup file
-     * @param backup Whether to back up the current data before performing a rollback
-     * @param users State information recipient
-     * @return 
+     * @param backup       Whether to back up the current data before performing a rollback
+     * @param users        State information recipient
+     * @return
      */
     public static Thread startRollBack(File rollBackFile, boolean backup, CommandSender... users) {
         Thread thread = new Thread(new RollBackMethod(rollBackFile, users).rollBack(backup), "LiteSignIn-RollBack");
         thread.start();
         return thread;
     }
-    
+
     /**
      * Roll back method.
      */
     public static class RollBackMethod {
-        
+
         private final File rollBackFile;
         private final CommandSender[] rollBackUsers;
-        
+
         public RollBackMethod(File rollBackFile, CommandSender... rollBackUsers) {
             this.rollBackFile = rollBackFile;
             this.rollBackUsers = rollBackUsers;
         }
-        
+
         public Runnable rollBack(boolean backup) {
             return () -> {
                 if (backup) {

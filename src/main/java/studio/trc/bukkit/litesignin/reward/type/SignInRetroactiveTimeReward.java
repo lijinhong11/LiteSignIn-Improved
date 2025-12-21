@@ -1,31 +1,28 @@
 package studio.trc.bukkit.litesignin.reward.type;
 
+import lombok.Getter;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
+import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
+import studio.trc.bukkit.litesignin.reward.SignInRewardModule;
+import studio.trc.bukkit.litesignin.reward.SignInRewardRetroactive;
+import studio.trc.bukkit.litesignin.reward.command.SignInRewardCommand;
+import studio.trc.bukkit.litesignin.reward.util.SignInGroup;
+import studio.trc.bukkit.litesignin.reward.util.SignInSound;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import lombok.Getter;
-
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
-import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
-import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
-import studio.trc.bukkit.litesignin.reward.util.SignInGroup;
-import studio.trc.bukkit.litesignin.reward.SignInRewardModule;
-import studio.trc.bukkit.litesignin.reward.SignInRewardRetroactive;
-import studio.trc.bukkit.litesignin.reward.command.SignInRewardCommand;
-import studio.trc.bukkit.litesignin.reward.util.SignInSound;
-
 public class SignInRetroactiveTimeReward
-    extends SignInRewardRetroactive
-{
+        extends SignInRewardRetroactive {
     @Getter
     private final SignInGroup group;
     @Getter
     private final Map<SignInRewardModule, Boolean> collection;
-    
+
     public SignInRetroactiveTimeReward(SignInGroup group) {
         this.group = group;
         collection = new HashMap<>();

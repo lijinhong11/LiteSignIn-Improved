@@ -1,27 +1,25 @@
 package studio.trc.bukkit.litesignin.configuration;
 
+import lombok.Getter;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
+import studio.trc.bukkit.litesignin.message.MessageUtil;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 import java.util.Map;
 
-import lombok.Getter;
-
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.ItemStack;
-
-import studio.trc.bukkit.litesignin.message.MessageUtil;
-
 /**
  * Used to manage configuration files.
+ *
  * @author Dean
  */
-public class RobustConfiguration
-{
+public class RobustConfiguration {
     @Getter
     private final ConfigurationType type;
     @Getter
@@ -31,7 +29,7 @@ public class RobustConfiguration
         this.type = type;
         this.config = type.getConfig();
     }
-    
+
     public void repairConfigurationSection(String path) {
         YamlConfiguration defaultFile = DefaultConfigurationFile.getDefaultConfig(type);
         config.set(path, defaultFile.get(path) != null ? defaultFile.get(path) : "null");
@@ -41,7 +39,7 @@ public class RobustConfiguration
         placeholders.put("{path}", path);
         MessageUtil.sendMessage(Bukkit.getConsoleSender(), ConfigurationType.MESSAGES.getRobustConfig(), "Repaired-Config-Section", placeholders);
     }
-    
+
     public Object get(String path) {
         return config.get(path);
     }
@@ -159,7 +157,7 @@ public class RobustConfiguration
             return config.getConfigurationSection(path);
         }
     }
-    
+
     public boolean contains(String path) {
         return config.contains(path);
     }
@@ -167,7 +165,7 @@ public class RobustConfiguration
     public void load(Reader reader) throws IOException, InvalidConfigurationException {
         config.load(reader);
     }
-    
+
     public void set(String path, Object value) {
         config.set(path, value);
     }

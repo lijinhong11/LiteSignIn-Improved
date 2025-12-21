@@ -2,8 +2,7 @@ package studio.trc.bukkit.litesignin.database;
 
 import lombok.Getter;
 
-public class DatabaseElement
-{
+public class DatabaseElement {
     @Getter
     private final String field;
     @Getter
@@ -12,7 +11,7 @@ public class DatabaseElement
     private final boolean isNull;
     @Getter
     private final boolean primaryKey;
-    
+
     public DatabaseElement(String field, String type, boolean isNull, boolean primaryKey) {
         this.field = field;
         this.type = type;

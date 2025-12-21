@@ -1,29 +1,26 @@
 package studio.trc.bukkit.litesignin.reward.type;
 
+import lombok.Getter;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
+import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
+import studio.trc.bukkit.litesignin.reward.SignInRewardColumn;
+import studio.trc.bukkit.litesignin.reward.SignInRewardModule;
+import studio.trc.bukkit.litesignin.reward.command.SignInRewardCommand;
+import studio.trc.bukkit.litesignin.reward.util.SignInGroup;
+import studio.trc.bukkit.litesignin.reward.util.SignInSound;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Getter;
-
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
-import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
-import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
-import studio.trc.bukkit.litesignin.reward.util.SignInGroup;
-import studio.trc.bukkit.litesignin.reward.command.SignInRewardCommand;
-import studio.trc.bukkit.litesignin.reward.SignInRewardColumn;
-import studio.trc.bukkit.litesignin.reward.SignInRewardModule;
-import studio.trc.bukkit.litesignin.reward.util.SignInSound;
-
 public class SignInStatisticsTimeReward
-    extends SignInRewardColumn
-{
+        extends SignInRewardColumn {
     @Getter
     private final SignInGroup group;
     @Getter
     private final int time;
-    
+
     public SignInStatisticsTimeReward(SignInGroup group, int time) {
         this.group = group;
         this.time = time;
@@ -33,7 +30,7 @@ public class SignInStatisticsTimeReward
     public SignInRewardModule getModule() {
         return SignInRewardModule.STATISTICS_TIME;
     }
-    
+
     @Override
     public boolean overrideDefaultRewards() {
         if (ConfigurationUtil.getConfig(ConfigurationType.REWARD_SETTINGS).contains("Reward-Settings.Permission-Groups." + group.getGroupName() + ".Statistics-Times." + time + ".Override-default-rewards")) {

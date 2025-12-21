@@ -1,16 +1,14 @@
 package studio.trc.bukkit.litesignin.reward.command;
 
-import java.util.Map;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-
 import studio.trc.bukkit.litesignin.Main;
 import studio.trc.bukkit.litesignin.message.MessageUtil;
 import studio.trc.bukkit.litesignin.util.PluginControl;
 
-public class SignInRewardCommand
-{
+import java.util.Map;
+
+public class SignInRewardCommand {
     private final SignInRewardCommandType type;
     private final String command;
 

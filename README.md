@@ -30,35 +30,35 @@ This is a plug-in for recording player check-in data, and rewards players for ch
 And more...  
 
 # Commands
-| Command | Function |
-|:- |:- |
-|/signin help | View command help.
-|/signin reload | Reload configuration files.
-|/signin gui [month] | Open the Sign In GUI menu.
-|/signin click [Date or playerName] [playerName] | Sign in now, or sign in for historical date.
-|/signin save | Save data for all online players.
-|/signin leaderboard [Date] [Page] | View the sign-in leaderboard for today or a specified date.
-|/signin database [backup/rollback/confirm] | Database managements
-|/signin info [playerName] | View player's information.
-|/signin itemcollection | Collection of management items.
-|/signin reward | Directly give the player a sign-in reward.
+| Command                                         | Function                                                    |
+|:------------------------------------------------|:------------------------------------------------------------|
+| /signin help                                    | View command help.                                          |
+| /signin reload                                  | Reload configuration files.                                 |
+| /signin gui [month]                             | Open the Sign In GUI menu.                                  |
+| /signin click [Date or playerName] [playerName] | Sign in now, or sign in for historical date.                |
+| /signin save                                    | Save data for all online players.                           |
+| /signin leaderboard [Date] [Page]               | View the sign-in leaderboard for today or a specified date. |
+| /signin database [backup/rollback/confirm]      | Database managements                                        |
+| /signin info [playerName]                       | View player's information.                                  |
+| /signin itemcollection                          | Collection of management items.                             |
+| /signin reward                                  | Directly give the player a sign-in reward.                  |
 
 # PlaceholderAPI's placeholders
-| Placeholder | Action |
-|:- |:- |
-|%litesignin_signed-in% | Did you sign in today?
-|%litesignin_group% | Return the player's group.
-|%litesignin_cards_amount% | Return number of retroactive cards.
-|%litesignin_statistics% | Return the cumulative numbers of user sign in.
-|%litesignin_continuous% | Return the number of continuous sign in.
-|%litesignin_statistics_of_month% | Return the cumulative numbers of user sign in of this month.
-|%litesignin_continuous_of_month% | Return the number of continuous sign in of this month.
-|%litesignin_last_year% | Returns the year of the latest sign-in.
-|%litesignin_last_month% | Returns the month of the latest sign-in.
-|%litesignin_last_day% | Returns the day of the latest sign-in.
-|%litesignin_last_hour% | Returns the hour of the latest sign-in.
-|%litesignin_last_minute% | Returns the minute of the latest sign-in.
-|%litesignin_last_second% | Returns the second of the latest sign-in.
+| Placeholder                      | Action                                                       |
+|:---------------------------------|:-------------------------------------------------------------|
+| %litesignin_signed-in%           | Did you sign in today?                                       |
+| %litesignin_group%               | Return the player's group.                                   |
+| %litesignin_cards_amount%        | Return number of retroactive cards.                          |
+| %litesignin_statistics%          | Return the cumulative numbers of user sign in.               |
+| %litesignin_continuous%          | Return the number of continuous sign in.                     |
+| %litesignin_statistics_of_month% | Return the cumulative numbers of user sign in of this month. |
+| %litesignin_continuous_of_month% | Return the number of continuous sign in of this month.       |
+| %litesignin_last_year%           | Returns the year of the latest sign-in.                      |
+| %litesignin_last_month%          | Returns the month of the latest sign-in.                     |
+| %litesignin_last_day%            | Returns the day of the latest sign-in.                       |
+| %litesignin_last_hour%           | Returns the hour of the latest sign-in.                      |
+| %litesignin_last_minute%         | Returns the minute of the latest sign-in.                    |
+| %litesignin_last_second%         | Returns the second of the latest sign-in.                    |
 
 Another placeholders:  
 %litesignin_random_[minimum]_[maximum]% Returns a random value within a specified range of numbers. (This is a placeholder for a gadget type.)

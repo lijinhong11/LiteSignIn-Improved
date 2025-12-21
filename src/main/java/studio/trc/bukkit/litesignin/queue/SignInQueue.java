@@ -1,44 +1,40 @@
 package studio.trc.bukkit.litesignin.queue;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-
 import studio.trc.bukkit.litesignin.database.DatabaseTable;
-import studio.trc.bukkit.litesignin.util.SignInDate;
 import studio.trc.bukkit.litesignin.database.engine.MySQLEngine;
 import studio.trc.bukkit.litesignin.database.engine.SQLQuery;
 import studio.trc.bukkit.litesignin.database.engine.SQLiteEngine;
 import studio.trc.bukkit.litesignin.util.PluginControl;
+import studio.trc.bukkit.litesignin.util.SignInDate;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Sign-in ranking.
+ *
  * @author Dean
  */
 public class SignInQueue
-    extends ArrayList<SignInQueueElement>
-{
+        extends ArrayList<SignInQueueElement> {
     private static final Map<SignInDate, SignInQueue> cache = new HashMap();
     private static final Map<SignInDate, Long> lastUpdateTime = new HashMap();
-    
+    private final FileConfiguration yamlFile = new YamlConfiguration();
+    private final SignInDate date;
+
+    public SignInQueue(SignInDate date) {
+        this.date = date;
+    }
+
     public static SignInQueue getInstance() {
         SignInDate date = SignInDate.getInstance(new Date());
         for (SignInDate dates : cache.keySet()) {
@@ -53,7 +49,7 @@ public class SignInQueue
         queue.checkUpdate();
         return queue;
     }
-    
+
     public static SignInQueue getInstance(SignInDate date) {
         for (SignInDate dates : cache.keySet()) {
             if (dates.equals(date)) {
@@ -67,18 +63,11 @@ public class SignInQueue
         queue.checkUpdate();
         return queue;
     }
-    
-    private final FileConfiguration yamlFile = new YamlConfiguration();
-    private final SignInDate date;
-    
-    public SignInQueue(SignInDate date) {
-        this.date = date;
-    }
-    
+
     public SignInDate getDate() {
         return date;
     }
-    
+
     public void loadQueue() {
         if (!PluginControl.enableSignInRanking()) {
             return;
@@ -98,7 +87,7 @@ public class SignInQueue
                                 time = SignInDate.getInstance(date.getYear(), date.getMonth(), date.getDay(), rs.getInt("Hour"), rs.getInt("Minute"), rs.getInt("Second"));
                             } else {
                                 Integer hour = null, minute = null, second = null;
-                                for (String data : Arrays.asList(rs.getString("History").split(", "))) {
+                                for (String data : rs.getString("History").split(", ")) {
                                     SignInDate targetDate = SignInDate.getInstance(data);
                                     if (date.equals(targetDate)) {
                                         if (targetDate.hasTimePeriod()) {
@@ -136,7 +125,7 @@ public class SignInQueue
                                 time = SignInDate.getInstance(date.getYear(), date.getMonth(), date.getDay(), rs.getInt("Hour"), rs.getInt("Minute"), rs.getInt("Second"));
                             } else {
                                 Integer hour = null, minute = null, second = null;
-                                for (String data : Arrays.asList(rs.getString("History").split(", "))) {
+                                for (String data : rs.getString("History").split(", ")) {
                                     SignInDate targetDate = SignInDate.getInstance(data);
                                     if (date.equals(targetDate)) {
                                         if (targetDate.hasTimePeriod()) {
@@ -167,7 +156,7 @@ public class SignInQueue
                     cacheFile.createNewFile();
                 }
                 if (!date.equals(SignInDate.getInstance(new Date()))) return;
-                try (Reader reader = new InputStreamReader(new FileInputStream(cacheFile), "UTF-8")) {
+                try (Reader reader = new InputStreamReader(new FileInputStream(cacheFile), StandardCharsets.UTF_8)) {
                     yamlFile.load(reader);
                 } catch (InvalidConfigurationException ex) {
                     Logger.getLogger(SignInQueue.class.getName()).log(Level.SEVERE, null, ex);
@@ -199,7 +188,7 @@ public class SignInQueue
             ex.printStackTrace();
         }
     }
-    
+
     public void addRecord(UUID uuid, SignInDate date) {
         SignInDate today = SignInDate.getInstance(new Date());
         if (!yamlFile.contains("Date") || !SignInDate.getInstance(yamlFile.getString("Date")).equals(today)) {
@@ -211,7 +200,7 @@ public class SignInQueue
         add(new SignInQueueElement(uuid, date, Bukkit.getOfflinePlayer(uuid).getName()));
         saveData();
     }
-    
+
     public SignInQueueElement getElement(UUID uuid) {
         checkUpdate();
         for (SignInQueueElement element : new ArrayList<>(this)) {
@@ -222,7 +211,7 @@ public class SignInQueue
         }
         return null;
     }
-    
+
     public int getRank(UUID uuid) {
         if (!PluginControl.enableSignInRanking()) {
             return 0;
@@ -255,7 +244,7 @@ public class SignInQueue
         }
         return rank;
     }
-    
+
     public List<SignInQueueElement> getUnknownTimesElement() {
         List<SignInQueueElement> list = new ArrayList<>();
         for (SignInQueueElement element : new ArrayList<>(this)) {
@@ -265,7 +254,7 @@ public class SignInQueue
         }
         return list;
     }
-    
+
     public void checkUpdate() {
         if (!PluginControl.enableSignInRanking()) {
             return;
@@ -286,7 +275,7 @@ public class SignInQueue
             }
         }
     }
-    
+
     public List<SignInQueueElement> getRankingUser(int ranking) {
         checkUpdate();
         List<SignInQueueElement> result = new ArrayList<>();
@@ -297,7 +286,7 @@ public class SignInQueue
         }
         return result;
     }
-    
+
     public void saveData() {
         if (!PluginControl.enableSignInRanking()) {
             return;

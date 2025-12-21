@@ -1,33 +1,26 @@
 package studio.trc.bukkit.litesignin.event;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-
 import studio.trc.bukkit.litesignin.Main;
 import studio.trc.bukkit.litesignin.api.Storage;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
-import studio.trc.bukkit.litesignin.message.MessageUtil;
 import studio.trc.bukkit.litesignin.database.util.BackupUtil;
 import studio.trc.bukkit.litesignin.database.util.RollBackUtil;
 import studio.trc.bukkit.litesignin.message.JSONComponent;
+import studio.trc.bukkit.litesignin.message.MessageUtil;
 import studio.trc.bukkit.litesignin.thread.LiteSignInThread;
-import studio.trc.bukkit.litesignin.util.OnlineTimeRecord;
-import studio.trc.bukkit.litesignin.util.Updater;
-import studio.trc.bukkit.litesignin.util.SignInDate;
-import studio.trc.bukkit.litesignin.util.PluginControl;
-import studio.trc.bukkit.litesignin.util.LiteSignInUtils;
-import studio.trc.bukkit.litesignin.util.SkullManager;
+import studio.trc.bukkit.litesignin.util.*;
+
+import java.util.Date;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Join
-    implements Listener
-{
+        implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onJoin(PlayerJoinEvent event) {
         if (BackupUtil.isBackingUp() || RollBackUtil.isRollingback()) {
@@ -55,10 +48,10 @@ public class Join
                                 Map<String, String> placeholders = MessageUtil.getDefaultPlaceholders();
                                 placeholders.put("{date}", date.getName(ConfigurationUtil.getConfig(ConfigurationType.GUI_SETTINGS).getString(MessageUtil.getLanguage() + ".SignIn-GUI-Settings.Date-Format")));
                                 JSONComponent jsonComponent = new JSONComponent(
-                                    MessageUtil.replacePlaceholders(player, MessageUtil.getMessage("Join-Event.Open-GUI"), placeholders),
-                                    MessageUtil.getMessageList("Join-Event.Hover-Text").stream().map(line -> MessageUtil.replacePlaceholders(player, line, placeholders)).collect(Collectors.toList()),
-                                    "RUN_COMMAND",
-                                    "/litesignin:signin gui"
+                                        MessageUtil.replacePlaceholders(player, MessageUtil.getMessage("Join-Event.Open-GUI"), placeholders),
+                                        MessageUtil.getMessageList("Join-Event.Hover-Text").stream().map(line -> MessageUtil.replacePlaceholders(player, line, placeholders)).collect(Collectors.toList()),
+                                        "RUN_COMMAND",
+                                        "/litesignin:signin gui"
                                 );
                                 MessageUtil.sendMessageWithJSONComponent(player, text, placeholders, "%openGUI%", jsonComponent);
                             } else {
@@ -102,7 +95,7 @@ public class Join
             }
         }
     }
-    
+
     public void schedule(Storage data, Player player, boolean unableToHoldCards, boolean autoSignIn) {
         PluginControl.runBukkitTask(() -> {
             if (unableToHoldCards) {

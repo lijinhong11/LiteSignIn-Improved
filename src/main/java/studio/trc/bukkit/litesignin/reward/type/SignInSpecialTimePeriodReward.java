@@ -1,39 +1,36 @@
 package studio.trc.bukkit.litesignin.reward.type;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.Getter;
-
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
-import studio.trc.bukkit.litesignin.reward.util.SignInGroup;
+import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
 import studio.trc.bukkit.litesignin.reward.SignInRewardColumn;
 import studio.trc.bukkit.litesignin.reward.SignInRewardModule;
 import studio.trc.bukkit.litesignin.reward.command.SignInRewardCommand;
+import studio.trc.bukkit.litesignin.reward.util.SignInGroup;
 import studio.trc.bukkit.litesignin.reward.util.SignInSound;
 import studio.trc.bukkit.litesignin.reward.util.SignInTimePeriod;
 import studio.trc.bukkit.litesignin.util.SignInDate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SignInSpecialTimePeriodReward
-    extends SignInRewardColumn
-{
+        extends SignInRewardColumn {
     @Getter
     private final SignInGroup group;
     @Getter
     private final SignInDate now;
     @Getter
     private final String setting;
-    
+
     public SignInSpecialTimePeriodReward(SignInGroup group, SignInDate now) {
         this.group = group;
         this.now = now;
         setting = SignInTimePeriod.getSetting(group, now);
     }
-    
+
     public boolean isAvailable() {
         return setting != null;
     }
@@ -42,7 +39,7 @@ public class SignInSpecialTimePeriodReward
     public SignInRewardModule getModule() {
         return SignInRewardModule.SPECIAL_TIME_PERIOD;
     }
-    
+
     @Override
     public boolean overrideDefaultRewards() {
         if (!isAvailable()) return false;

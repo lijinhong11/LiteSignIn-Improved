@@ -1,40 +1,31 @@
 package studio.trc.bukkit.litesignin.util;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
-
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-
 import org.bukkit.OfflinePlayer;
-
 import studio.trc.bukkit.litesignin.api.Storage;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
 import studio.trc.bukkit.litesignin.queue.SignInQueue;
 
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 public class PlaceholderAPIImpl
-    extends PlaceholderExpansion
-{
-    private final Random random = new Random();
-    
+        extends PlaceholderExpansion {
     private static final PlaceholderAPIImpl instance = new PlaceholderAPIImpl();
     private static final Map<UUID, Map<String, String>> cacheOfPlayers = new HashMap();
     private static final Map<String, String> cacheOfServer = new HashMap();
-    
     private static long cacheOfUpdateTime = System.currentTimeMillis();
-    
+    private final Random random = new Random();
+
     public PlaceholderAPIImpl() {
         super();
     }
-    
+
     public static PlaceholderAPIImpl getInstance() {
         return instance;
     }
-    
+
     public static void checkUpdate() {
         if (cacheOfUpdateTime < System.currentTimeMillis()) {
             cacheOfPlayers.clear();
@@ -42,7 +33,7 @@ public class PlaceholderAPIImpl
             cacheOfUpdateTime = System.currentTimeMillis() + (long) (ConfigurationUtil.getConfig(ConfigurationType.CONFIG).getDouble("PlaceholderAPI.Cache-Update-Delay") * 1000);
         }
     }
-  
+
     @Override
     public String onRequest(OfflinePlayer player, String identifier) {
         checkUpdate();
@@ -95,7 +86,8 @@ public class PlaceholderAPIImpl
                 String[] time = identifier.split("_");
                 try {
                     result = String.valueOf(data.getCumulativeNumberOfMonth(Integer.valueOf(time[3]), Integer.valueOf(time[4])));
-                } catch (Throwable t) {}
+                } catch (Throwable t) {
+                }
             }
         } else if (identifier.startsWith("today_online_time")) {
             if (identifier.equalsIgnoreCase("today_online_time")) {
@@ -104,7 +96,8 @@ public class PlaceholderAPIImpl
                 String[] time = identifier.split("_", 4);
                 try {
                     result = new SimpleDateFormat(time[2]).format(new Date(OnlineTimeRecord.getTodayOnlineTime(player.getUniqueId())));
-                } catch (Throwable t) {}
+                } catch (Throwable t) {
+                }
             }
         } else if (identifier.equalsIgnoreCase("continuous")) {
             result = String.valueOf(data.getContinuousSignIn());

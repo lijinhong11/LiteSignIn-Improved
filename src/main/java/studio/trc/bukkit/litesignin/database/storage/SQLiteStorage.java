@@ -1,49 +1,38 @@
 package studio.trc.bukkit.litesignin.database.storage;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import lombok.Getter;
-
-import studio.trc.bukkit.litesignin.api.Storage;
-import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
-import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
-import studio.trc.bukkit.litesignin.configuration.RobustConfiguration;
-import studio.trc.bukkit.litesignin.database.DatabaseTable;
-import studio.trc.bukkit.litesignin.event.custom.PlayerSignInEvent;
-import studio.trc.bukkit.litesignin.event.custom.SignInRewardEvent;
-import studio.trc.bukkit.litesignin.queue.SignInQueue;
-import studio.trc.bukkit.litesignin.util.SignInDate;
-import studio.trc.bukkit.litesignin.util.PluginControl;
-import studio.trc.bukkit.litesignin.util.LiteSignInUtils;
-import studio.trc.bukkit.litesignin.database.engine.SQLiteEngine;
-import studio.trc.bukkit.litesignin.database.engine.SQLQuery;
-import studio.trc.bukkit.litesignin.reward.SignInRewardSchedule;
-import studio.trc.bukkit.litesignin.reward.type.*;
-import studio.trc.bukkit.litesignin.reward.util.SignInGroup;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import studio.trc.bukkit.litesignin.api.Storage;
+import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
+import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
+import studio.trc.bukkit.litesignin.configuration.RobustConfiguration;
+import studio.trc.bukkit.litesignin.database.DatabaseTable;
+import studio.trc.bukkit.litesignin.database.engine.SQLQuery;
+import studio.trc.bukkit.litesignin.database.engine.SQLiteEngine;
+import studio.trc.bukkit.litesignin.event.custom.PlayerSignInEvent;
+import studio.trc.bukkit.litesignin.event.custom.SignInRewardEvent;
+import studio.trc.bukkit.litesignin.queue.SignInQueue;
+import studio.trc.bukkit.litesignin.reward.SignInRewardSchedule;
+import studio.trc.bukkit.litesignin.reward.type.*;
+import studio.trc.bukkit.litesignin.reward.util.SignInGroup;
+import studio.trc.bukkit.litesignin.util.LiteSignInUtils;
+import studio.trc.bukkit.litesignin.util.PluginControl;
+import studio.trc.bukkit.litesignin.util.SignInDate;
+
+import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Date;
 
 public final class SQLiteStorage
-    implements Storage
-{
+        implements Storage {
     public static final Map<UUID, SQLiteStorage> cache = new HashMap();
-    
+    private static long lastUpdateTime = System.currentTimeMillis();
+    private final UUID uuid;
     @Getter
     private int continuous = 0;
     @Getter
@@ -62,22 +51,101 @@ public final class SQLiteStorage
     private String name = null;
     @Getter
     private List<SignInDate> history = new ArrayList<>();
-    private final UUID uuid;
-    private int retroactiveCard = 0; 
+    private int retroactiveCard = 0;
     private boolean loaded = false;
-    
+
     public SQLiteStorage(Player player) {
         uuid = player.getUniqueId();
         reloadData();
         cache.put(uuid, SQLiteStorage.this);
     }
-    
+
     public SQLiteStorage(UUID uuid) {
         this.uuid = uuid;
         reloadData();
         cache.put(uuid, SQLiteStorage.this);
     }
-    
+
+    public static SQLiteStorage getPlayerData(Player player) {
+        if (PluginControl.getSQLiteRefreshInterval() <= 0) {
+            return new SQLiteStorage(player.getUniqueId());
+        }
+        SQLiteStorage data = cache.get(player.getUniqueId());
+        if (data != null && (PluginControl.getSQLiteRefreshInterval() == 0 || System.currentTimeMillis() - lastUpdateTime >= PluginControl.getSQLiteRefreshInterval() * 1000)) {
+            return data;
+        }
+        data = new SQLiteStorage(player.getUniqueId());
+        cache.clear();
+        cache.put(player.getUniqueId(), data);
+        lastUpdateTime = System.currentTimeMillis();
+        return data;
+    }
+
+    public static SQLiteStorage getPlayerData(UUID uuid) {
+        if (PluginControl.getSQLiteRefreshInterval() <= 0) {
+            return new SQLiteStorage(uuid);
+        }
+        SQLiteStorage data = cache.get(uuid);
+        if (data != null && (PluginControl.getSQLiteRefreshInterval() == 0 || System.currentTimeMillis() - lastUpdateTime >= PluginControl.getSQLiteRefreshInterval() * 1000)) {
+            return data;
+        }
+        data = new SQLiteStorage(uuid);
+        cache.clear();
+        cache.put(uuid, data);
+        lastUpdateTime = System.currentTimeMillis();
+        return data;
+    }
+
+    /**
+     * Back up all player data.
+     *
+     * @param filePath Backup file path.
+     * @throws java.sql.SQLException
+     */
+    public static void backup(String filePath) throws SQLException {
+        try (Connection sqlConnection = DriverManager.getConnection("jdbc:sqlite:" + filePath)) {
+            sqlConnection.prepareStatement(DatabaseTable.PLAYER_DATA.getDefaultCreateTableSyntax()).executeUpdate();
+            SQLiteEngine sqlite = SQLiteEngine.getInstance();
+            try (SQLQuery result = sqlite.executeQuery("SELECT * FROM " + sqlite.getTableSyntax(DatabaseTable.PLAYER_DATA))) {
+                ResultSet rs = result.getResult();
+                try (PreparedStatement statement = sqlConnection.prepareStatement("INSERT INTO PlayerData(UUID, Name, Year, Month, Day, Hour, Minute, Second, Continuous, RetroactiveCard, History)  VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+                    while (rs.next()) {
+                        String uuid = rs.getString("UUID");
+                        String name = rs.getString("Name");
+                        int year = rs.getInt("Year");
+                        int month = rs.getInt("Month");
+                        int day = rs.getInt("Day");
+                        int hour = rs.getInt("Hour");
+                        int minute = rs.getInt("Minute");
+                        int second = rs.getInt("Second");
+                        int continuous = rs.getInt("Continuous");
+                        int retroactivecard = rs.getInt("RetroactiveCard");
+                        String history = rs.getString("History");
+                        if (name == null) {
+                            name = "null";
+                        }
+                        if (history == null) {
+                            history = "";
+                        }
+                        statement.setString(1, uuid);
+                        statement.setString(2, name);
+                        statement.setInt(3, year);
+                        statement.setInt(4, month);
+                        statement.setInt(5, day);
+                        statement.setInt(6, hour);
+                        statement.setInt(7, minute);
+                        statement.setInt(8, second);
+                        statement.setInt(9, continuous);
+                        statement.setInt(10, retroactivecard);
+                        statement.setString(11, history);
+                        statement.addBatch();
+                    }
+                    statement.executeBatch();
+                }
+            }
+        }
+    }
+
     public void reloadData() {
         try {
             SQLiteEngine sqlite = SQLiteEngine.getInstance();
@@ -96,7 +164,7 @@ public final class SQLiteStorage
                     retroactiveCard = rs.getObject("RetroactiveCard") != null ? rs.getInt("RetroactiveCard") : 0;
                     if (rs.getObject("History") != null && !rs.getString("History").equals("")) {
                         List<SignInDate> list = new ArrayList<>();
-                        for (String data : Arrays.asList(rs.getString("History").split(", "))) {
+                        for (String data : rs.getString("History").split(", ")) {
                             list.add(SignInDate.getInstance(data));
                         }
                         history = list;
@@ -116,14 +184,15 @@ public final class SQLiteStorage
             SQLiteEngine.getInstance().throwSQLException(ex, "ExecuteQueryFailed", true);
         }
     }
-    
+
     @Override
     public void checkContinuousSignIn() {
         String[] date = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date()).split("-");
         int y = getYear();
         int m = getMonth();
         int d = getDay();
-        if (Integer.valueOf(date[0]) == year && Integer.valueOf(date[1]) == month && Integer.valueOf(date[2]) == day) return;
+        if (Integer.valueOf(date[0]) == year && Integer.valueOf(date[1]) == month && Integer.valueOf(date[2]) == day)
+            return;
         boolean breakSign = true;
         if (y == Integer.valueOf(date[0])) {
             int[] ds = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
@@ -144,7 +213,7 @@ public final class SQLiteStorage
             setContinuousSignIn(0, true);
         }
     }
-    
+
     @Override
     public void giveReward(SignInDate retroactiveDate) {
         Player player = Bukkit.getPlayer(uuid);
@@ -218,7 +287,7 @@ public final class SQLiteStorage
             rewardQueue.run(retroactiveDate != null);
         }
     }
-    
+
     @Override
     public SignInGroup getGroup() {
         Player player = Bukkit.getPlayer(uuid);
@@ -246,35 +315,35 @@ public final class SQLiteStorage
         List<SignInGroup> groups = new ArrayList<>();
         RobustConfiguration config = ConfigurationUtil.getConfig(ConfigurationType.REWARD_SETTINGS);
         config.getStringList("Reward-Settings.Groups-Priority").stream()
-            .filter(group -> group.equalsIgnoreCase("Default") || (config.get("Reward-Settings.Permission-Groups." + group + ".Permission") != null && player.hasPermission(config.getString("Reward-Settings.Permission-Groups." + group + ".Permission"))))
-            .forEach(group -> groups.add(new SignInGroup(group)));
+                .filter(group -> group.equalsIgnoreCase("Default") || (config.get("Reward-Settings.Permission-Groups." + group + ".Permission") != null && player.hasPermission(config.getString("Reward-Settings.Permission-Groups." + group + ".Permission"))))
+                .forEach(group -> groups.add(new SignInGroup(group)));
         if (groups.isEmpty() && config.get("Reward-Settings.Permission-Groups.Default") != null) {
             groups.add(new SignInGroup("Default"));
         }
         return groups;
     }
-    
+
     @Override
     public int getContinuousSignIn() {
         return continuous;
     }
-    
+
     @Override
     public int getCumulativeNumber() {
         return clearUselessData(getHistory()).size();
     }
-    
+
     @Override
     public int getContinuousSignInOfMonth() {
         return SignInDate.getContinuousOfMonth(history);
     }
-    
+
     @Override
     public int getCumulativeNumberOfMonth(int year, int month) {
         return clearUselessData(getHistory()).stream().filter(record -> record.getYear() == year && record.getMonth() == month).toArray().length;
 //        return SignInDate.getCumulativeNumberOfMonth(clearUselessData(getHistory()), month);
     }
-    
+
     @Override
     public int getRetroactiveCard() {
         if (PluginControl.enableRetroactiveCardRequiredItem()) {
@@ -295,17 +364,17 @@ public final class SQLiteStorage
         }
         return retroactiveCard;
     }
-    
+
     @Override
     public UUID getUserUUID() {
         return uuid;
     }
-    
+
     @Override
     public Player getPlayer() {
         return Bukkit.getPlayer(uuid);
     }
-    
+
     @Override
     public boolean alreadySignIn() {
         return getHistory().stream().anyMatch(date -> date.equals(SignInDate.getInstance(new Date())));
@@ -327,13 +396,13 @@ public final class SQLiteStorage
         }).forEach(date -> record.add(date.getYear() + "-" + date.getMonth() + "-" + date.getDay()));
         return result;
     }
-    
+
     @Override
     public void setHistory(List<SignInDate> history, boolean saveData) {
         this.history = history;
         if (saveData) saveData();
     }
-    
+
     @Override
     public void signIn() {
         if (LiteSignInUtils.checkInDisabledWorlds(uuid)) return;
@@ -351,7 +420,7 @@ public final class SQLiteStorage
         SignInQueue.getInstance().loadQueue();
         giveReward(null);
     }
-    
+
     @Override
     public void signIn(SignInDate historicalDate) {
         if (LiteSignInUtils.checkInDisabledWorlds(uuid)) return;
@@ -390,7 +459,7 @@ public final class SQLiteStorage
         giveReward(historicalDate);
         lastSignInTime.put(uuid, System.currentTimeMillis());
     }
-    
+
     @Override
     public void setSignInTime(SignInDate date, boolean saveData) {
         year = date.getYear();
@@ -401,13 +470,13 @@ public final class SQLiteStorage
         second = date.getSecond();
         if (saveData) saveData();
     }
-    
+
     @Override
     public void setContinuousSignIn(int number, boolean saveData) {
         continuous = number;
         if (saveData) saveData();
     }
-    
+
     @Override
     public void giveRetroactiveCard(int amount) {
         if (amount < 1) return;
@@ -458,7 +527,7 @@ public final class SQLiteStorage
             setRetroactiveCard(getRetroactiveCard() - amount, true);
         }
     }
-    
+
     @Override
     public void setRetroactiveCard(int amount, boolean saveData) {
         if (PluginControl.enableRetroactiveCardRequiredItem()) {
@@ -486,7 +555,7 @@ public final class SQLiteStorage
             if (saveData) saveData();
         }
     }
-    
+
     @Override
     public void saveData() {
         if (loaded) {
@@ -495,98 +564,17 @@ public final class SQLiteStorage
                 sqlite.checkConnection();
                 String playerName = Bukkit.getPlayer(uuid) != null ? Bukkit.getPlayer(uuid).getName() : Bukkit.getOfflinePlayer(uuid) != null ? Bukkit.getOfflinePlayer(uuid).getName() : "null";
                 sqlite.executeUpdate("UPDATE " + sqlite.getTableSyntax(DatabaseTable.PLAYER_DATA) + " SET Name = ?,"
-                    + "Year = " + year + ", "
-                    + "Month = " + month + ", "
-                    + "Day = " + day + ", "
-                    + "Hour = " + hour + ", "
-                    + "Minute = " + minute + ", "
-                    + "Second = " + second + ", "
-                    + "Continuous = " + continuous + ", "
-                    + "RetroactiveCard = " + retroactiveCard + ", History = ? WHERE UUID = ?",
-                    playerName, history.toString().substring(1, history.toString().length() - 1), uuid.toString());
+                                + "Year = " + year + ", "
+                                + "Month = " + month + ", "
+                                + "Day = " + day + ", "
+                                + "Hour = " + hour + ", "
+                                + "Minute = " + minute + ", "
+                                + "Second = " + second + ", "
+                                + "Continuous = " + continuous + ", "
+                                + "RetroactiveCard = " + retroactiveCard + ", History = ? WHERE UUID = ?",
+                        playerName, history.toString().substring(1, history.toString().length() - 1), uuid.toString());
             } catch (SQLException ex) {
                 ex.printStackTrace();
-            }
-        }
-    }
-    
-    private static long lastUpdateTime = System.currentTimeMillis();
-    
-    public static SQLiteStorage getPlayerData(Player player) {
-        if (PluginControl.getSQLiteRefreshInterval() <= 0) {
-            return new SQLiteStorage(player.getUniqueId());
-        }
-        SQLiteStorage data = cache.get(player.getUniqueId());
-        if (data != null && (PluginControl.getSQLiteRefreshInterval() == 0 || System.currentTimeMillis() - lastUpdateTime >= PluginControl.getSQLiteRefreshInterval() * 1000)) {
-            return data;
-        }
-        data = new SQLiteStorage(player.getUniqueId());
-        cache.clear();
-        cache.put(player.getUniqueId(), data);
-        lastUpdateTime = System.currentTimeMillis();
-        return data;
-    }
-    
-    public static SQLiteStorage getPlayerData(UUID uuid) {
-        if (PluginControl.getSQLiteRefreshInterval() <= 0) {
-            return new SQLiteStorage(uuid);
-        }
-        SQLiteStorage data = cache.get(uuid);
-        if (data != null && (PluginControl.getSQLiteRefreshInterval() == 0 || System.currentTimeMillis() - lastUpdateTime >= PluginControl.getSQLiteRefreshInterval() * 1000)) {
-            return data;
-        }
-        data = new SQLiteStorage(uuid);
-        cache.clear();
-        cache.put(uuid, data);
-        lastUpdateTime = System.currentTimeMillis();
-        return data;
-    }
-    
-    /**
-     * Back up all player data.
-     * @param filePath Backup file path. 
-     * @throws java.sql.SQLException 
-     */
-    public static void backup(String filePath) throws SQLException {
-        try (Connection sqlConnection = DriverManager.getConnection("jdbc:sqlite:" + filePath)) {
-            sqlConnection.prepareStatement(DatabaseTable.PLAYER_DATA.getDefaultCreateTableSyntax()).executeUpdate();
-            SQLiteEngine sqlite = SQLiteEngine.getInstance();
-            try (SQLQuery result = sqlite.executeQuery("SELECT * FROM " + sqlite.getTableSyntax(DatabaseTable.PLAYER_DATA))) {
-                ResultSet rs = result.getResult();
-                try (PreparedStatement statement = sqlConnection.prepareStatement("INSERT INTO PlayerData(UUID, Name, Year, Month, Day, Hour, Minute, Second, Continuous, RetroactiveCard, History)  VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
-                    while (rs.next()) {
-                        String uuid = rs.getString("UUID");
-                        String name = rs.getString("Name");
-                        int year = rs.getInt("Year");
-                        int month = rs.getInt("Month");
-                        int day = rs.getInt("Day");
-                        int hour = rs.getInt("Hour");
-                        int minute = rs.getInt("Minute");
-                        int second = rs.getInt("Second");
-                        int continuous = rs.getInt("Continuous");
-                        int retroactivecard = rs.getInt("RetroactiveCard");
-                        String history = rs.getString("History");
-                        if (name == null) {
-                            name = "null";
-                        }
-                        if (history == null) {
-                            history = "";
-                        }
-                        statement.setString(1, uuid);
-                        statement.setString(2, name);
-                        statement.setInt(3, year);
-                        statement.setInt(4, month);
-                        statement.setInt(5, day);
-                        statement.setInt(6, hour);
-                        statement.setInt(7, minute);
-                        statement.setInt(8, second);
-                        statement.setInt(9, continuous);
-                        statement.setInt(10, retroactivecard);
-                        statement.setString(11, history);
-                        statement.addBatch();
-                    }
-                    statement.executeBatch();
-                }
             }
         }
     }

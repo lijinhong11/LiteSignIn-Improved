@@ -1,22 +1,19 @@
 package studio.trc.bukkit.litesignin.message.color;
 
-import java.awt.Color;
-import java.util.List;
-
 import lombok.Getter;
-
 import net.md_5.bungee.api.ChatColor;
-
 import studio.trc.bukkit.litesignin.message.tag.TagContentExtractor;
 import studio.trc.bukkit.litesignin.message.tag.TagContentInfo;
 
+import java.awt.*;
+import java.util.List;
+
 
 public class RainbowColor
-    implements FunctionalColor
-{
+        implements FunctionalColor {
     @Getter
     private static final RainbowColor instance = new RainbowColor();
-    
+
     @Override
     public String coloring(String content) {
         String original = content;
@@ -28,7 +25,7 @@ public class RainbowColor
             String offsetX;
             String offsetY;
             if (tagContent.getAttribute() != null) {
-                reverse = tagContent.getAttribute().substring(0, 1).equals("!");
+                reverse = tagContent.getAttribute().charAt(0) == '!';
                 String[] parameters = (reverse ? tagContent.getAttribute().substring(1) : tagContent.getAttribute()).split(":", 2);
                 if (parameters.length == 2) {
                     offsetX = parameters[0].isEmpty() ? null : parameters[0];
@@ -47,7 +44,7 @@ public class RainbowColor
         }
         return content;
     }
-    
+
     public ChatColor[] makeRainbow(int depth, float offsetX, float offsetY, boolean reverse) {
         ChatColor[] colors = new ChatColor[depth];
         if (offsetY == 0) offsetX = offsetY = 1; //Prevent division from being zero

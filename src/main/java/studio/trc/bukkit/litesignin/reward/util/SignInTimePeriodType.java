@@ -1,7 +1,7 @@
 package studio.trc.bukkit.litesignin.reward.util;
 
 public enum SignInTimePeriodType {
-    
+
     /**
      * Now.
      */
@@ -15,5 +15,5 @@ public enum SignInTimePeriodType {
     /**
      * It will be triggered if the current time is earlier than this time.
      */
-    BEFORE_THIS_TIME;
+    BEFORE_THIS_TIME
 }

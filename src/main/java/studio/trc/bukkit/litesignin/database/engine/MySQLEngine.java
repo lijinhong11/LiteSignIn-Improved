@@ -1,16 +1,7 @@
 package studio.trc.bukkit.litesignin.database.engine;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
-import java.util.Map;
-
 import lombok.Getter;
 import lombok.Setter;
-
 import studio.trc.bukkit.litesignin.Main;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
@@ -18,18 +9,21 @@ import studio.trc.bukkit.litesignin.database.DatabaseEngine;
 import studio.trc.bukkit.litesignin.database.DatabaseTable;
 import studio.trc.bukkit.litesignin.database.DatabaseType;
 import studio.trc.bukkit.litesignin.message.MessageUtil;
-import studio.trc.bukkit.litesignin.util.PluginControl;
 import studio.trc.bukkit.litesignin.util.LiteSignInProperties;
+import studio.trc.bukkit.litesignin.util.PluginControl;
+
+import java.sql.*;
+import java.util.List;
+import java.util.Map;
 
 public class MySQLEngine
-    implements DatabaseEngine
-{
+        implements DatabaseEngine {
     @Getter
     @Setter
     private static MySQLEngine instance = null;
     @Getter
     private static Connection mysqlConnection = null;
-    
+
     @Getter
     private final int port;
     @Getter
@@ -40,7 +34,7 @@ public class MySQLEngine
     private final String password;
     @Getter
     private final Map<String, String> jdbcOptions;
-    
+
     public MySQLEngine(String hostname, int port, String userName, String password, Map<String, String> jdbcOptions) {
         this.hostname = hostname;
         this.port = port;
@@ -48,7 +42,7 @@ public class MySQLEngine
         this.password = password;
         this.jdbcOptions = jdbcOptions;
     }
-    
+
     @Override
     public void connect() {
         try {
@@ -75,7 +69,7 @@ public class MySQLEngine
             throwSQLException(ex, "ConnectionFailed", false);
         }
     }
-    
+
     @Override
     public void disconnect() {
         if (mysqlConnection != null) {
@@ -91,7 +85,7 @@ public class MySQLEngine
             }
         }
     }
-    
+
     @Override
     public void checkConnection() throws SQLException {
         if (Main.getInstance().isEnabled()) {
@@ -100,7 +94,7 @@ public class MySQLEngine
             }
         }
     }
-    
+
     @Override
     public int executeUpdate(String sqlSyntax, String... values) {
         try {
@@ -118,7 +112,7 @@ public class MySQLEngine
             return 0;
         }
     }
-    
+
     @Override
     public int[] executeMultiQueries(String sqlSyntax, List<Map<Integer, String>> parameters) {
         try {
@@ -137,7 +131,7 @@ public class MySQLEngine
             return new int[0];
         }
     }
-    
+
     @Override
     public SQLQuery executeQuery(String sqlSyntax, String... values) {
         try {
@@ -159,7 +153,7 @@ public class MySQLEngine
     public Connection getConnection() {
         return mysqlConnection;
     }
-    
+
     @Override
     public void throwSQLException(Exception exception, String path, boolean reconnect) {
         Map<String, String> placeholders = MessageUtil.getDefaultPlaceholders();
@@ -174,7 +168,7 @@ public class MySQLEngine
             ex.printStackTrace();
         }
     }
-    
+
     @Override
     public void initialize() {
         if (PluginControl.useMySQLStorage()) {
@@ -194,11 +188,11 @@ public class MySQLEngine
             }
         }
     }
-    
+
     public String getDatabaseName() {
         return ConfigurationUtil.getConfig(ConfigurationType.CONFIG).getString("MySQL-Storage.Database");
     }
-    
+
     public String getTableSyntax(DatabaseTable table) {
         if (ConfigurationUtil.getConfig(ConfigurationType.CONFIG).getBoolean("MySQL-Storage.Automatic-Deploy-Mode")) {
             return getDatabaseName() + "." + table.getDisplayName();
@@ -206,7 +200,7 @@ public class MySQLEngine
             return table.getDisplayName();
         }
     }
-    
+
     private StringBuilder getConnectionURI() {
         StringBuilder builder = new StringBuilder();
         if (jdbcOptions.isEmpty()) return builder;

@@ -1,22 +1,13 @@
 package studio.trc.bukkit.litesignin.command.subcommand;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import lombok.Getter;
-
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
 import studio.trc.bukkit.litesignin.command.SignInSubCommand;
 import studio.trc.bukkit.litesignin.command.SignInSubCommandType;
 import studio.trc.bukkit.litesignin.message.MessageUtil;
@@ -25,9 +16,14 @@ import studio.trc.bukkit.litesignin.util.AdventureUtils;
 import studio.trc.bukkit.litesignin.util.CustomItem;
 import studio.trc.bukkit.litesignin.util.LiteSignInUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 public class ItemCollectionCommand
-    implements SignInSubCommand
-{
+        implements SignInSubCommand {
     @Override
     public void execute(CommandSender sender, String subCommand, String... args) {
         if (args.length == 1) {
@@ -102,13 +98,13 @@ public class ItemCollectionCommand
                         String[] splitMessage = text.split("%list%");
                         List<BaseComponent> message = new ArrayList<>();
                         List<BaseComponent> components = new ArrayList<>();
-                        for (int i = 0;i < itemList.size();i++) {
+                        for (int i = 0; i < itemList.size(); i++) {
                             components.add(NMSManager.getBungeeJSONItemStack(itemList.get(i).getItemStack()));
                             if (i != itemList.size() - 1) {
                                 components.add(new TextComponent(", "));
                             }
                         }
-                        for (int i = 0;i < splitMessage.length;i++) {
+                        for (int i = 0; i < splitMessage.length; i++) {
                             message.add(new TextComponent(MessageUtil.replacePlaceholders(sender, splitMessage[i], placeholders)));
                             if (i < splitMessage.length - 1 || text.endsWith("%list%")) {
                                 message.addAll(components);
@@ -225,34 +221,34 @@ public class ItemCollectionCommand
         }
         return list;
     }
-    
+
     public enum SubCommandType {
         /**
          * /signin itemcollection list
          */
         LIST("list", "ItemCollection.List"),
-        
+
         /**
          * /signin itemcollection add
          */
         ADD("add", "ItemCollection.Add"),
-        
+
         /**
          * /signin itemcollection delete
          */
         DELETE("delete", "ItemCollection.Delete"),
-        
+
         /**
          * /signin itemcollection give
          */
         GIVE("give", "ItemCollection.Give");
-        
+
         @Getter
         private final String commandName;
         @Getter
         private final String commandPermissionPath;
-        
-        private SubCommandType(String commandName, String commandPermissionPath) {
+
+        SubCommandType(String commandName, String commandPermissionPath) {
             this.commandName = commandName;
             this.commandPermissionPath = commandPermissionPath;
         }

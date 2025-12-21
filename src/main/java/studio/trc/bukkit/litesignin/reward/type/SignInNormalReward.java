@@ -1,27 +1,24 @@
 package studio.trc.bukkit.litesignin.reward.type;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.Getter;
-
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
-import studio.trc.bukkit.litesignin.reward.util.SignInGroup;
+import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
 import studio.trc.bukkit.litesignin.reward.SignInRewardModule;
 import studio.trc.bukkit.litesignin.reward.SignInRewardUtil;
 import studio.trc.bukkit.litesignin.reward.command.SignInRewardCommand;
+import studio.trc.bukkit.litesignin.reward.util.SignInGroup;
 import studio.trc.bukkit.litesignin.reward.util.SignInSound;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SignInNormalReward
-    extends SignInRewardUtil
-{
+        extends SignInRewardUtil {
     @Getter
     private final SignInGroup group;
-    
+
     public SignInNormalReward(SignInGroup group) {
         this.group = group;
     }
@@ -30,7 +27,7 @@ public class SignInNormalReward
     public SignInRewardModule getModule() {
         return SignInRewardModule.NORMAL;
     }
-    
+
     @Override
     public List<String> getMessages() {
         if (ConfigurationUtil.getConfig(ConfigurationType.REWARD_SETTINGS).contains("Reward-Settings.Permission-Groups." + group.getGroupName() + ".Normal-Time.Messages")) {

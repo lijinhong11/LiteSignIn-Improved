@@ -1,23 +1,20 @@
 package studio.trc.bukkit.litesignin.message;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import lombok.Getter;
-
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
-
 import studio.trc.bukkit.litesignin.util.AdventureUtils;
 import studio.trc.bukkit.litesignin.util.LiteSignInProperties;
 
-public class JSONComponent
-{
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+public class JSONComponent {
     @Getter
     private final String text;
     @Getter
@@ -26,7 +23,7 @@ public class JSONComponent
     private final String clickContent;
     @Getter
     private final List<String> hoverContent;
-    
+
     private BaseComponent bungeeComponent = null;
     private Object adventureComponent = null;
 
@@ -36,7 +33,7 @@ public class JSONComponent
         this.clickAction = clickAction;
         this.clickContent = clickContent;
     }
-    
+
     public BaseComponent getBungeeComponent() {
         if (bungeeComponent == null) {
             net.md_5.bungee.api.chat.HoverEvent hoverEvent = null;
@@ -69,7 +66,7 @@ public class JSONComponent
         }
         return bungeeComponent;
     }
-    
+
     public Object getAdventureComponent() {
         if (adventureComponent == null) {
             HoverEvent hoverEvent = null;
@@ -94,7 +91,7 @@ public class JSONComponent
         }
         return adventureComponent;
     }
-    
+
     public BaseComponent getBungeeComponent(Map<String, String> placeholders) {
         net.md_5.bungee.api.chat.HoverEvent hoverEvent = null;
         net.md_5.bungee.api.chat.ClickEvent clickEvent = null;
@@ -124,7 +121,7 @@ public class JSONComponent
         if (clickEvent != null) processedComponent.setClickEvent(clickEvent);
         return processedComponent;
     }
-    
+
     public Object getAdventureComponent(Map<String, String> placeholders) {
         try {
             HoverEvent hoverEvent = null;

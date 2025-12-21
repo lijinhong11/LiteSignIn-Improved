@@ -1,33 +1,26 @@
 package studio.trc.bukkit.litesignin.database.util;
 
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
+import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
+import studio.trc.bukkit.litesignin.database.storage.MySQLStorage;
+import studio.trc.bukkit.litesignin.database.storage.SQLiteStorage;
+import studio.trc.bukkit.litesignin.database.storage.YamlStorage;
+import studio.trc.bukkit.litesignin.event.Menu;
+import studio.trc.bukkit.litesignin.message.MessageUtil;
+import studio.trc.bukkit.litesignin.util.PluginControl;
+import studio.trc.bukkit.litesignin.util.SignInDate;
+
 import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
-import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
-import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
-import studio.trc.bukkit.litesignin.message.MessageUtil;
-import studio.trc.bukkit.litesignin.database.storage.YamlStorage;
-import studio.trc.bukkit.litesignin.database.storage.MySQLStorage;
-import studio.trc.bukkit.litesignin.database.storage.SQLiteStorage;
-import studio.trc.bukkit.litesignin.event.Menu;
-import studio.trc.bukkit.litesignin.util.PluginControl;
-import studio.trc.bukkit.litesignin.util.SignInDate;
-
-public class BackupUtil
-{
+public class BackupUtil {
     private static CommandSender[] backupUsers = {};
     private static boolean backingup = false;
-    
-    public static boolean isBackingUp() {
-        return backingup;
-    }
-    
     public static Runnable backupMethod = () -> {
         Bukkit.getOnlinePlayers().stream().filter(ps -> Menu.menuOpening.containsKey(ps.getUniqueId())).forEachOrdered(Player::closeInventory);
         try {
@@ -59,7 +52,7 @@ public class BackupUtil
             for (CommandSender sender : BackupUtil.backupUsers) {
                 if (sender != null) {
                     Map<String, String> placeholders = MessageUtil.getDefaultPlaceholders();
-                    placeholders.put("{file}",  fileName);
+                    placeholders.put("{file}", fileName);
                     MessageUtil.sendMessage(sender, ConfigurationUtil.getConfig(ConfigurationType.MESSAGES), "Database-Management.Backup.Successfully", placeholders);
                 }
             }
@@ -68,7 +61,7 @@ public class BackupUtil
             for (CommandSender sender : BackupUtil.backupUsers) {
                 if (sender != null) {
                     Map<String, String> placeholders = MessageUtil.getDefaultPlaceholders();
-                    placeholders.put("{error}",  t.getLocalizedMessage() != null ? t.getLocalizedMessage() : "null");
+                    placeholders.put("{error}", t.getLocalizedMessage() != null ? t.getLocalizedMessage() : "null");
                     MessageUtil.sendMessage(sender, ConfigurationUtil.getConfig(ConfigurationType.MESSAGES), "Database-Management.Backup.Failed", placeholders);
                 }
             }
@@ -76,14 +69,18 @@ public class BackupUtil
             backingup = false;
         }
     };
-    
+
+    public static boolean isBackingUp() {
+        return backingup;
+    }
+
     public static Thread startBackup(CommandSender... users) {
         backupUsers = users;
         Thread thread = new Thread(backupMethod);
         thread.start();
         return thread;
     }
-    
+
     public static void startSyncBackup(CommandSender... users) {
         backupUsers = users;
         backupMethod.run();

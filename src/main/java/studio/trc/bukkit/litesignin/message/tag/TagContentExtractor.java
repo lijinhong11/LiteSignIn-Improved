@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TagContentExtractor 
-{
+public class TagContentExtractor {
     /**
      * Extract content info from specified tags.
-     * @param text Text
+     *
+     * @param text    Text
      * @param tagName The tag name
      * @return All the content info that contains specific tag.
      */
@@ -18,8 +18,9 @@ public class TagContentExtractor
 
     /**
      * Extract content info from specified tags.
-     * @param text Text
-     * @param tagName The tag name
+     *
+     * @param text       Text
+     * @param tagName    The tag name
      * @param ignoreCase Whether ignore case
      * @return All the content info that contains specific tag.
      */
@@ -28,35 +29,38 @@ public class TagContentExtractor
         String closeTag = ignoreCase ? "</" + tagName.toLowerCase() + ">" : "</" + tagName + ">";
         return getTagContentsInfo(text, openTag, closeTag, ignoreCase);
     }
-    
+
     /**
      * Extract content info from specified tags.
-     * @param text Text
-     * @param openTag Open tag
+     *
+     * @param text     Text
+     * @param openTag  Open tag
      * @param closeTag Close tag
      * @return All the content info that contains specific tag.
      */
     public static List<TagContentInfo> getTagContentsInfo(String text, String openTag, String closeTag) {
         return getTagContentsInfo(text, openTag, closeTag, false);
     }
-    
+
     /**
      * Extract content info from specified tags.
-     * @param text Text
-     * @param openTag Open tag
-     * @param closeTag Close tag
+     *
+     * @param text       Text
+     * @param openTag    Open tag
+     * @param closeTag   Close tag
      * @param ignoreCase Whether ignore case
      * @return All the content info that contains specific tag.
      */
     public static List<TagContentInfo> getTagContentsInfo(String text, String openTag, String closeTag, boolean ignoreCase) {
         return getTagContentsInfo(text, openTag, closeTag, ignoreCase, new ArrayList<>());
     }
-    
+
     /**
      * Extract content info from specified tags.
-     * @param text Text
-     * @param openTag Open tag
-     * @param closeTag Close tag
+     *
+     * @param text       Text
+     * @param openTag    Open tag
+     * @param closeTag   Close tag
      * @param ignoreCase Whether ignore case
      * @param attributes Tag attributes
      * @return All the content info that contains specific tag.
@@ -87,7 +91,7 @@ public class TagContentExtractor
             }
             //Search original tag
             tempPos = (ignoreCase ? text.toLowerCase() : text).indexOf(ignoreCase ? openTag.toLowerCase() : openTag, index);
-            if (tempPos != -1 && (startPos > tempPos || startPos == -1)){
+            if (tempPos != -1 && (startPos > tempPos || startPos == -1)) {
                 startPos = tempPos;
                 extraLength = 0;
                 attributeResult = null;
@@ -106,18 +110,18 @@ public class TagContentExtractor
                         break;
                     }
                 }
-                if (index + openTagLength <= text.length() && 
-                    (ignoreCase ? text.substring(index, index + openTagLength).equalsIgnoreCase(openTag) : text.substring(index, index + openTagLength).equals(openTag))) {
+                if (index + openTagLength <= text.length() &&
+                        (ignoreCase ? text.substring(index, index + openTagLength).equalsIgnoreCase(openTag) : text.substring(index, index + openTagLength).equals(openTag))) {
                     depth++;
-                } else if (index + closeTagLength <= text.length() && 
-                    (ignoreCase ? text.substring(index, index + closeTagLength).equalsIgnoreCase(closeTag) : text.substring(index, index + closeTagLength).equals(closeTag))) {
+                } else if (index + closeTagLength <= text.length() &&
+                        (ignoreCase ? text.substring(index, index + closeTagLength).equalsIgnoreCase(closeTag) : text.substring(index, index + closeTagLength).equals(closeTag))) {
                     depth--;
                 } else if (!attributes.isEmpty()) {
                     for (String attribute : attributes) {
                         String newOpenTag = openTag.substring(0, openTagLength - 1) + ":" + attribute + ">";
                         int newOpenTagLength = newOpenTag.length();
-                        if (index + newOpenTagLength <= text.length() && 
-                            (ignoreCase ? text.substring(index, index + newOpenTagLength).equalsIgnoreCase(newOpenTag) : text.substring(index, index + newOpenTagLength).equals(newOpenTag))) {
+                        if (index + newOpenTagLength <= text.length() &&
+                                (ignoreCase ? text.substring(index, index + newOpenTagLength).equalsIgnoreCase(newOpenTag) : text.substring(index, index + newOpenTagLength).equals(newOpenTag))) {
                             depth++;
                             break;
                         }
@@ -132,35 +136,36 @@ public class TagContentExtractor
             //Complete tag
             if (endPos != -1) {
                 results.add(new TagContentInfo(
-                    text.substring(contentStart, endPos),
-                    openTag,
-                    closeTag,
-                    startPos,
-                    endPos + closeTagLength
+                        text.substring(contentStart, endPos),
+                        openTag,
+                        closeTag,
+                        startPos,
+                        endPos + closeTagLength
                 ).setAttribute(attributeResult));
-                skip.add(new Integer[] {endPos, endPos + closeTagLength});
-            //Single tag
+                skip.add(new Integer[]{endPos, endPos + closeTagLength});
+                //Single tag
             } else {
                 results.add(new TagContentInfo(
-                    text.substring(contentStart),
-                    openTag,
-                    null,
-                    startPos,
-                    text.length()
+                        text.substring(contentStart),
+                        openTag,
+                        null,
+                        startPos,
+                        text.length()
                 ).setAttribute(attributeResult));
             }
             index = contentStart;
         }
         return results;
     }
-    
+
     /**
      * Get a single tag
-     * @param text Text
-     * @param openTag Open tag
-     * @param closeTag Close tag
+     *
+     * @param text       Text
+     * @param openTag    Open tag
+     * @param closeTag   Close tag
      * @param ignoreCase Whether ignore case
-     * @return 
+     * @return
      */
     public static TagContentInfo getTagContentInfo(String text, String openTag, String closeTag, boolean ignoreCase) {
         if (text == null || text.isEmpty()) return null;
@@ -173,11 +178,11 @@ public class TagContentExtractor
         int endPos = -1;
         int index = contentStart;
         while (index < text.length()) {
-            if (index + openTagLength <= text.length() && 
-                (ignoreCase ? text.substring(index, index + openTagLength).equalsIgnoreCase(openTag) : text.substring(index, index + openTagLength).equals(openTag))) {
+            if (index + openTagLength <= text.length() &&
+                    (ignoreCase ? text.substring(index, index + openTagLength).equalsIgnoreCase(openTag) : text.substring(index, index + openTagLength).equals(openTag))) {
                 depth++;
-            } else if (index + closeTagLength <= text.length() && 
-                (ignoreCase ? text.substring(index, index + closeTagLength).equalsIgnoreCase(closeTag) : text.substring(index, index + closeTagLength).equals(closeTag))) {
+            } else if (index + closeTagLength <= text.length() &&
+                    (ignoreCase ? text.substring(index, index + closeTagLength).equalsIgnoreCase(closeTag) : text.substring(index, index + closeTagLength).equals(closeTag))) {
                 depth--;
             }
             if (depth == 0) {
@@ -189,28 +194,29 @@ public class TagContentExtractor
         //Complete tag
         if (endPos != -1) {
             return new TagContentInfo(
-                text.substring(contentStart, endPos),
-                openTag,
-                closeTag,
-                startPos,
-                endPos + closeTagLength
+                    text.substring(contentStart, endPos),
+                    openTag,
+                    closeTag,
+                    startPos,
+                    endPos + closeTagLength
             );
-        //Single tag
+            //Single tag
         } else {
             return new TagContentInfo(
-                text.substring(contentStart),
-                openTag,
-                null,
-                startPos,
-                text.length()
+                    text.substring(contentStart),
+                    openTag,
+                    null,
+                    startPos,
+                    text.length()
             );
         }
     }
-    
+
     /**
      * Extract content info from specified tags.
-     * @param text Text
-     * @param tagName The tag name
+     *
+     * @param text       Text
+     * @param tagName    The tag name
      * @param ignoreCase Whether ignore case
      * @param attributes Whether to get attributes
      * @return All the content info that contains specific tag.
@@ -225,13 +231,14 @@ public class TagContentExtractor
         String closeTag = ignoreCase ? "</" + tagName.toLowerCase() + ">" : "</" + tagName + ">";
         return getTagContentsInfo(text, openTag, closeTag, ignoreCase, tagAttributes);
     }
-    
+
     /**
      * Get the specified section from the text
-     * @param text Text
+     *
+     * @param text       Text
      * @param targetChar Target character
      * @param ignoreCase Whether ignore case
-     * @return 
+     * @return
      */
     public static TagContentInfo getSection(String text, char targetChar, boolean ignoreCase) {
         int index = 0;
@@ -251,11 +258,11 @@ public class TagContentExtractor
             }
             if (endPos != -1) {
                 return new TagContentInfo(
-                    text.substring(contentStart, endPos).replace("\\" + targetChar, String.valueOf(targetChar)),
-                    String.valueOf(targetChar),
-                    String.valueOf(targetChar),
-                    startPos,
-                    endPos
+                        text.substring(contentStart, endPos).replace("\\" + targetChar, String.valueOf(targetChar)),
+                        String.valueOf(targetChar),
+                        String.valueOf(targetChar),
+                        startPos,
+                        endPos
                 );
             } else {
                 break;
@@ -263,13 +270,14 @@ public class TagContentExtractor
         }
         return null;
     }
-    
+
     /**
      * Get the specified section from the text
-     * @param text Text
+     *
+     * @param text       Text
      * @param targetChar Target character
      * @param ignoreCase Whether ignore case
-     * @return 
+     * @return
      */
     public static List<TagContentInfo> getSections(String text, char targetChar, boolean ignoreCase) {
         List<TagContentInfo> results = new ArrayList<>();
@@ -291,11 +299,11 @@ public class TagContentExtractor
             }
             if (endPos != -1) {
                 results.add(new TagContentInfo(
-                    text.substring(contentStart, endPos).replace("\\" + targetChar, String.valueOf(targetChar)),
-                    String.valueOf(targetChar),
-                    String.valueOf(targetChar),
-                    startPos,
-                    endPos
+                        text.substring(contentStart, endPos).replace("\\" + targetChar, String.valueOf(targetChar)),
+                        String.valueOf(targetChar),
+                        String.valueOf(targetChar),
+                        startPos,
+                        endPos
                 ));
                 index = endPos + 1;
             } else {
@@ -304,11 +312,11 @@ public class TagContentExtractor
         }
         return results;
     }
-    
+
     public static List<TagContentInfo> sortTags(List<TagContentInfo> tags) {
         return tags.stream().sorted((TagContentInfo tag1, TagContentInfo tag2) -> tag1.getStartPosition() > tag2.getStartPosition() ? 1 : -1).collect(Collectors.toList());
     }
-    
+
     private static List<String> getTagAttributes(String startString, String endString, String text, boolean ignoreCase) {
         List<String> result = new ArrayList<>();
         StringBuilder builder = new StringBuilder(text);
@@ -329,9 +337,9 @@ public class TagContentExtractor
                             depth = (depth == 1) ? 0 : 1;
                             i += startLength;
                         }
-                    } else if (i + endLength <= builder.length() && 
-                        (ignoreCase ? !startString.equalsIgnoreCase(endString) : !startString.equals(endString)) && 
-                        (ignoreCase ? builder.substring(i, i + endLength).equalsIgnoreCase(endString) : builder.substring(i, i + endLength).equals(endString))) {
+                    } else if (i + endLength <= builder.length() &&
+                            (ignoreCase ? !startString.equalsIgnoreCase(endString) : !startString.equals(endString)) &&
+                            (ignoreCase ? builder.substring(i, i + endLength).equalsIgnoreCase(endString) : builder.substring(i, i + endLength).equals(endString))) {
                         depth--;
                         i += endLength;
                     } else {

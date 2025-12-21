@@ -1,7 +1,5 @@
 package studio.trc.bukkit.litesignin.util.woodsignscript;
 
-import java.util.Map;
-
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -13,16 +11,15 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-
 import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
 import studio.trc.bukkit.litesignin.message.MessageUtil;
-
 import studio.trc.bukkit.litesignin.util.PluginControl;
 
+import java.util.Map;
+
 public class WoodSignEvent
-    implements Listener
-{
+        implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void click(PlayerInteractEvent event) {
         if (event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
@@ -36,7 +33,7 @@ public class WoodSignEvent
             }
         }
     }
-    
+
     @EventHandler(priority = EventPriority.LOWEST)
     public void destroy(BlockBreakEvent event) {
         Block block = event.getBlock();
@@ -51,7 +48,7 @@ public class WoodSignEvent
             MessageUtil.sendMessage(event.getPlayer(), ConfigurationUtil.getConfig(ConfigurationType.MESSAGES), "Wood-Sign.Successfully-Remove", placeholders);
         }
     }
-    
+
     @EventHandler(priority = EventPriority.LOWEST)
     public void check(BlockPlaceEvent event) {
         Block block = event.getBlock();
@@ -60,7 +57,7 @@ public class WoodSignEvent
         }
         WoodSignUtil.removeWoodSignScript(block.getLocation());
     }
-    
+
     @EventHandler(priority = EventPriority.LOWEST)
     public void place(SignChangeEvent event) {
         if (!PluginControl.enableSignScript() || !(event.getBlock().getState() instanceof Sign)) {

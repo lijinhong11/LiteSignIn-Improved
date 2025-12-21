@@ -1,10 +1,7 @@
 package studio.trc.bukkit.litesignin.util.metrics;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import javax.net.ssl.HttpsURLConnection;
+import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
@@ -17,7 +14,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.zip.GZIPOutputStream;
-import javax.net.ssl.HttpsURLConnection;
 
 /**
  *
@@ -25,9 +21,11 @@ import javax.net.ssl.HttpsURLConnection;
  */
 public class MetricsBase {
 
-    /** The version of the Metrics class. */
+    /**
+     * The version of the Metrics class.
+     */
     public static final String METRICS_VERSION = "1.0.0";
-    
+
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1, task -> new Thread(task, "bStats-Metrics"));
     private static final String REPORT_URL = "https://bStats.org/api/v2/data/%s";
     private final String platform;
@@ -48,23 +46,23 @@ public class MetricsBase {
     /**
      * Creates a new MetricsBase class instance.
      *
-     * @param platform The platform of the service.
-     * @param serviceId The id of the service.
-     * @param serverUuid The server uuid.
-     * @param enabled Whether or not data sending is enabled.
-     * @param appendPlatformDataConsumer A consumer that receives a {@code JsonObjectBuilder} and
-     *     appends all platform-specific data.
-     * @param appendServiceDataConsumer A consumer that receives a {@code JsonObjectBuilder} and
-     *     appends all service-specific data.
-     * @param submitTaskConsumer A consumer that takes a runnable with the submit task. This can be
-     *     used to delegate the data collection to a another thread to prevent errors caused by
-     *     concurrency. Can be {@code null}.
+     * @param platform                    The platform of the service.
+     * @param serviceId                   The id of the service.
+     * @param serverUuid                  The server uuid.
+     * @param enabled                     Whether or not data sending is enabled.
+     * @param appendPlatformDataConsumer  A consumer that receives a {@code JsonObjectBuilder} and
+     *                                    appends all platform-specific data.
+     * @param appendServiceDataConsumer   A consumer that receives a {@code JsonObjectBuilder} and
+     *                                    appends all service-specific data.
+     * @param submitTaskConsumer          A consumer that takes a runnable with the submit task. This can be
+     *                                    used to delegate the data collection to a another thread to prevent errors caused by
+     *                                    concurrency. Can be {@code null}.
      * @param checkServiceEnabledSupplier A supplier to check if the service is still enabled.
-     * @param errorLogger A consumer that accepts log message and an error.
-     * @param infoLogger A consumer that accepts info log messages.
-     * @param logErrors Whether or not errors should be logged.
-     * @param logSentData Whether or not the sent data should be logged.
-     * @param logResponseStatusText Whether or not the response status text should be logged.
+     * @param errorLogger                 A consumer that accepts log message and an error.
+     * @param infoLogger                  A consumer that accepts info log messages.
+     * @param logErrors                   Whether or not errors should be logged.
+     * @param logSentData                 Whether or not the sent data should be logged.
+     * @param logResponseStatusText       Whether or not the response status text should be logged.
      */
     public MetricsBase(String platform, String serverUuid, int serviceId, boolean enabled, Consumer<JsonObjectBuilder> appendPlatformDataConsumer, Consumer<JsonObjectBuilder> appendServiceDataConsumer, Consumer<Runnable> submitTaskConsumer, Supplier<Boolean> checkServiceEnabledSupplier, BiConsumer<String, Throwable> errorLogger, Consumer<String> infoLogger, boolean logErrors, boolean logSentData, boolean logResponseStatusText) {
         this.platform = platform;
@@ -86,6 +84,23 @@ public class MetricsBase {
         }
     }
 
+    /**
+     * Gzips the given string.
+     *
+     * @param str The string to gzip.
+     * @return The gzipped string.
+     */
+    private static byte[] compress(final String str) throws IOException {
+        if (str == null) {
+            return null;
+        }
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try (GZIPOutputStream gzip = new GZIPOutputStream(outputStream)) {
+            gzip.write(str.getBytes(StandardCharsets.UTF_8));
+        }
+        return outputStream.toByteArray();
+    }
+
     public void addCustomChart(CustomChart chart) {
         this.customCharts.add(chart);
     }
@@ -93,14 +108,14 @@ public class MetricsBase {
     private void startSubmitting() {
         Runnable submitTask = () -> {
             if (!enabled || !checkServiceEnabledSupplier.get()) {
-              // Submitting data or service is disabled
-              scheduler.shutdown();
-              return;
+                // Submitting data or service is disabled
+                scheduler.shutdown();
+                return;
             }
             if (submitTaskConsumer != null) {
-              submitTaskConsumer.accept(this::submitData);
+                submitTaskConsumer.accept(this::submitData);
             } else {
-              this.submitData();
+                this.submitData();
             }
         };
         // Many servers tend to restart at a fixed time at xx:00 which causes an uneven distribution
@@ -122,10 +137,10 @@ public class MetricsBase {
         final JsonObjectBuilder serviceJsonBuilder = new JsonObjectBuilder();
         appendServiceDataConsumer.accept(serviceJsonBuilder);
         JsonObject[] chartData =
-            customCharts.stream()
-                .map(customChart -> customChart.getRequestJsonObject(errorLogger, logErrors))
-                .filter(Objects::nonNull)
-                .toArray(JsonObject[]::new);
+                customCharts.stream()
+                        .map(customChart -> customChart.getRequestJsonObject(errorLogger, logErrors))
+                        .filter(Objects::nonNull)
+                        .toArray(JsonObject[]::new);
         serviceJsonBuilder.appendField("id", serviceId);
         serviceJsonBuilder.appendField("customCharts", chartData);
         baseJsonBuilder.appendField("service", serviceJsonBuilder.build());
@@ -134,7 +149,7 @@ public class MetricsBase {
         JsonObject data = baseJsonBuilder.build();
         scheduler.execute(() -> {
             try {
-              // Send the data
+                // Send the data
                 sendData(data);
             } catch (Exception e) {
                 // Something went wrong! :(
@@ -176,40 +191,25 @@ public class MetricsBase {
         }
     }
 
-    /** Checks that the class was properly relocated. */
+    /**
+     * Checks that the class was properly relocated.
+     */
     private void checkRelocation() {
         // You can use the property to disable the check in your test environment
         if (System.getProperty("bstats.relocatecheck") == null
-            || !System.getProperty("bstats.relocatecheck").equals("false")) {
+                || !System.getProperty("bstats.relocatecheck").equals("false")) {
             // Maven's Relocate is clever and changes strings, too. So we have to use this little
             // "trick" ... :D
             final String defaultPackage =
-                new String(new byte[] {'o', 'r', 'g', '.', 'b', 's', 't', 'a', 't', 's'});
+                    new String(new byte[]{'o', 'r', 'g', '.', 'b', 's', 't', 'a', 't', 's'});
             final String examplePackage =
-                new String(new byte[] {'y', 'o', 'u', 'r', '.', 'p', 'a', 'c', 'k', 'a', 'g', 'e'});
+                    new String(new byte[]{'y', 'o', 'u', 'r', '.', 'p', 'a', 'c', 'k', 'a', 'g', 'e'});
             // We want to make sure no one just copy & pastes the example and uses the wrong package
             // names
             if (MetricsBase.class.getPackage().getName().startsWith(defaultPackage)
-                || MetricsBase.class.getPackage().getName().startsWith(examplePackage)) {
+                    || MetricsBase.class.getPackage().getName().startsWith(examplePackage)) {
                 throw new IllegalStateException("bStats Metrics class has not been relocated correctly!");
             }
         }
-    }
-
-    /**
-     * Gzips the given string.
-     *
-     * @param str The string to gzip.
-     * @return The gzipped string.
-     */
-    private static byte[] compress(final String str) throws IOException {
-        if (str == null) {
-            return null;
-        }
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        try (GZIPOutputStream gzip = new GZIPOutputStream(outputStream)) {
-            gzip.write(str.getBytes(StandardCharsets.UTF_8));
-        }
-        return outputStream.toByteArray();
     }
 }

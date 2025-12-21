@@ -7,14 +7,14 @@ public abstract class CustomChart {
     private final String chartId;
 
     protected CustomChart(String chartId) {
-      if (chartId == null) {
-        throw new IllegalArgumentException("chartId must not be null");
-      }
-      this.chartId = chartId;
+        if (chartId == null) {
+            throw new IllegalArgumentException("chartId must not be null");
+        }
+        this.chartId = chartId;
     }
 
     public JsonObject getRequestJsonObject(
-        BiConsumer<String, Throwable> errorLogger, boolean logErrors) {
+            BiConsumer<String, Throwable> errorLogger, boolean logErrors) {
         JsonObjectBuilder builder = new JsonObjectBuilder();
         builder.appendField("chartId", chartId);
         try {

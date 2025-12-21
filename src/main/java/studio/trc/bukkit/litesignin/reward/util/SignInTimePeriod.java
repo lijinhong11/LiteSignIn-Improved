@@ -1,11 +1,10 @@
 package studio.trc.bukkit.litesignin.reward.util;
 
-import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
+import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
 import studio.trc.bukkit.litesignin.util.SignInDate;
 
-public class SignInTimePeriod
-{
+public class SignInTimePeriod {
     public static String getSetting(SignInGroup group, SignInDate time) {
         if (!ConfigurationUtil.getConfig(ConfigurationType.REWARD_SETTINGS).contains("Reward-Settings.Permission-Groups." + group.getGroupName() + ".Special-Time-periods")) {
             return null;
@@ -31,15 +30,15 @@ public class SignInTimePeriod
                         }
                         case 2: {
                             if (time.getHour() == timePeriod.getHour() &&
-                                time.getMinute() == timePeriod.getMinute()) {
+                                    time.getMinute() == timePeriod.getMinute()) {
                                 return value;
                             }
                             break;
                         }
                         case 3: {
                             if (time.getHour() == timePeriod.getHour() &&
-                                time.getMinute() == timePeriod.getMinute() &&
-                                time.getSecond() == timePeriod.getSecond()) {
+                                    time.getMinute() == timePeriod.getMinute() &&
+                                    time.getSecond() == timePeriod.getSecond()) {
                                 return value;
                             }
                             break;
@@ -81,7 +80,7 @@ public class SignInTimePeriod
         }
         return null;
     }
-    
+
     public static SignInTimePeriodType getFromName(String name) {
         if (name == null) return null;
         for (SignInTimePeriodType timePeriod : SignInTimePeriodType.values()) {

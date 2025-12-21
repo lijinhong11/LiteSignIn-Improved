@@ -1,29 +1,5 @@
 package studio.trc.bukkit.litesignin.event;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
-import studio.trc.bukkit.litesignin.Main;
-import studio.trc.bukkit.litesignin.api.Storage;
-import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
-import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
-import studio.trc.bukkit.litesignin.message.MessageUtil;
-import studio.trc.bukkit.litesignin.database.util.BackupUtil;
-import studio.trc.bukkit.litesignin.database.util.RollBackUtil;
-import studio.trc.bukkit.litesignin.thread.LiteSignInThread;
-import studio.trc.bukkit.litesignin.event.custom.SignInGUICloseEvent;
-import studio.trc.bukkit.litesignin.event.custom.SignInGUIOpenEvent;
-import studio.trc.bukkit.litesignin.gui.SignInGUIColumn;
-import studio.trc.bukkit.litesignin.gui.SignInGUI;
-import studio.trc.bukkit.litesignin.gui.SignInInventory;
-import studio.trc.bukkit.litesignin.util.OnlineTimeRecord;
-import studio.trc.bukkit.litesignin.util.PluginControl;
-import studio.trc.bukkit.litesignin.util.SignInDate;
-import studio.trc.bukkit.litesignin.util.LiteSignInUtils;
-import studio.trc.bukkit.litesignin.queue.SignInQueue;
-
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -33,12 +9,34 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
+import studio.trc.bukkit.litesignin.Main;
+import studio.trc.bukkit.litesignin.api.Storage;
+import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
+import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
+import studio.trc.bukkit.litesignin.database.util.BackupUtil;
+import studio.trc.bukkit.litesignin.database.util.RollBackUtil;
+import studio.trc.bukkit.litesignin.event.custom.SignInGUICloseEvent;
+import studio.trc.bukkit.litesignin.event.custom.SignInGUIOpenEvent;
+import studio.trc.bukkit.litesignin.gui.SignInGUI;
+import studio.trc.bukkit.litesignin.gui.SignInGUIColumn;
+import studio.trc.bukkit.litesignin.gui.SignInInventory;
+import studio.trc.bukkit.litesignin.message.MessageUtil;
+import studio.trc.bukkit.litesignin.queue.SignInQueue;
+import studio.trc.bukkit.litesignin.thread.LiteSignInThread;
+import studio.trc.bukkit.litesignin.util.LiteSignInUtils;
+import studio.trc.bukkit.litesignin.util.OnlineTimeRecord;
+import studio.trc.bukkit.litesignin.util.PluginControl;
+import studio.trc.bukkit.litesignin.util.SignInDate;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class Menu
-    implements Listener
-{
+        implements Listener {
     public static final Map<UUID, SignInInventory> menuOpening = new HashMap();
-    
+
     public static void openGUI(Player player) {
         Runnable task = () -> {
             SignInInventory inventory = SignInGUI.getGUI(player);
@@ -51,7 +49,7 @@ public class Menu
             task.run();
         }
     }
-    
+
     public static void openGUI(Player player, int month) {
         Runnable task = () -> {
             SignInInventory inventory = SignInGUI.getGUI(player, month);
@@ -64,7 +62,7 @@ public class Menu
             task.run();
         }
     }
-    
+
     public static void openGUI(Player player, int month, int year) {
         Runnable task = () -> {
             SignInInventory inventory = SignInGUI.getGUI(player, month, year);
@@ -77,7 +75,7 @@ public class Menu
             task.run();
         }
     }
-    
+
     public static void callEvent(SignInGUIOpenEvent event, Player player, SignInInventory inventory) {
         PluginControl.runBukkitTask(() -> {
             Bukkit.getPluginManager().callEvent(event);
@@ -87,7 +85,7 @@ public class Menu
             }
         }, 0);
     }
-    
+
     @EventHandler(priority = EventPriority.MONITOR)
     public void click(InventoryClickEvent e) {
         if (e.getWhoClicked() instanceof Player) {
@@ -210,7 +208,7 @@ public class Menu
             }
         }
     }
-    
+
     @EventHandler(ignoreCancelled = true)
     public void close(InventoryCloseEvent e) {
         if (e.getPlayer() instanceof Player) {
@@ -226,7 +224,7 @@ public class Menu
             }
         }
     }
-    
+
     public void runCommand(Player player, String commands, Map<String, String> placeholders) {
         if (commands.toLowerCase().startsWith("server:")) {
             Main.getInstance().getServer().dispatchCommand(Bukkit.getConsoleSender(), MessageUtil.replacePlaceholders(player, commands.substring(7), placeholders));

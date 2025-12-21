@@ -1,11 +1,9 @@
 package studio.trc.bukkit.litesignin.message;
 
 import lombok.Getter;
-
 import net.md_5.bungee.api.chat.BaseComponent;
 
-public class MessageSection
-{
+public class MessageSection {
     @Getter
     private final int startsWith;
     @Getter
@@ -18,7 +16,7 @@ public class MessageSection
     private final String text;
     @Getter
     private final String placeholder;
-    
+
     public MessageSection(String text, String placeholder, int startsWith, int endsWith) {
         this.text = text;
         this.startsWith = startsWith;

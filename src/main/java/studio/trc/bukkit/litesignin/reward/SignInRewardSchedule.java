@@ -1,36 +1,36 @@
 package studio.trc.bukkit.litesignin.reward;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import studio.trc.bukkit.litesignin.api.Storage;
 import studio.trc.bukkit.litesignin.reward.type.SignInNormalReward;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Sign in reward queue
+ *
  * @author Dean
  */
-public class SignInRewardSchedule
-{
+public class SignInRewardSchedule {
     private final List<SignInReward> queue = new ArrayList<>();
     private final Storage playerData;
-    
+
     public SignInRewardSchedule(Storage playerData) {
         this.playerData = playerData;
     }
-    
+
     public List<SignInReward> getRewards() {
         return queue;
     }
-    
+
     public void addReward(SignInReward reward) {
         queue.add(reward);
     }
-    
+
     public void clearQueue() {
         queue.clear();
     }
-    
+
     public void run(boolean retroactive) {
         if (retroactive) {
             SignInRewardRetroactive retroactiveTime = null;

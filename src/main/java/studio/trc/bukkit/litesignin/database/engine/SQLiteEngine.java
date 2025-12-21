@@ -1,19 +1,7 @@
 package studio.trc.bukkit.litesignin.database.engine;
 
-import java.io.File;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
-import java.util.Map;
-
 import lombok.Getter;
 import lombok.Setter;
-
 import studio.trc.bukkit.litesignin.Main;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
@@ -23,20 +11,24 @@ import studio.trc.bukkit.litesignin.database.DatabaseType;
 import studio.trc.bukkit.litesignin.message.MessageUtil;
 import studio.trc.bukkit.litesignin.util.LiteSignInProperties;
 
-public class SQLiteEngine 
-    implements DatabaseEngine
-{
+import java.io.File;
+import java.io.IOException;
+import java.sql.*;
+import java.util.List;
+import java.util.Map;
+
+public class SQLiteEngine
+        implements DatabaseEngine {
     @Getter
     @Setter
     private static SQLiteEngine instance = null;
     @Getter
-    private Connection sqliteConnection = null;
-    
-    @Getter
     private final String folderPath;
     @Getter
     private final String fileName;
-    
+    @Getter
+    private Connection sqliteConnection = null;
+
     public SQLiteEngine(String folderPath, String fileName) {
         this.folderPath = folderPath;
         this.fileName = fileName;
@@ -132,7 +124,7 @@ public class SQLiteEngine
             return new int[0];
         }
     }
-    
+
     @Override
     public SQLQuery executeQuery(String sqlSyntax, String... values) {
         try {
@@ -169,7 +161,7 @@ public class SQLiteEngine
             ex.printStackTrace();
         }
     }
-    
+
     @Override
     public void initialize() {
         try {
@@ -184,7 +176,7 @@ public class SQLiteEngine
             throwSQLException(ex, "InitializationFailed", true);
         }
     }
-    
+
     public String getTableSyntax(DatabaseTable table) {
         return table.getDisplayName();
     }

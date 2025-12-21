@@ -1,22 +1,20 @@
 package studio.trc.bukkit.litesignin.command.subcommand;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
 import studio.trc.bukkit.litesignin.api.Storage;
 import studio.trc.bukkit.litesignin.command.SignInSubCommand;
 import studio.trc.bukkit.litesignin.command.SignInSubCommandType;
 import studio.trc.bukkit.litesignin.message.MessageUtil;
 import studio.trc.bukkit.litesignin.queue.SignInQueue;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 public class InfoCommand
-    implements SignInSubCommand
-{
+        implements SignInSubCommand {
     @Override
     public void execute(CommandSender sender, String subCommand, String... args) {
         Map<String, String> placeholders = MessageUtil.getDefaultPlaceholders();

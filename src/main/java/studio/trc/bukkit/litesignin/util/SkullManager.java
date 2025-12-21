@@ -7,6 +7,11 @@ import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
+import lombok.Getter;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -18,19 +23,11 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import lombok.Getter;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
-
-public class SkullManager
-{
+public class SkullManager {
     @Getter
     private static final Map<UUID, String> base64Meta = new ConcurrentHashMap<>();
     private static final Gson gson = new Gson();
-    
+
     public static void refreshTexture(UUID uuid, String name) {
         if (base64Meta.containsKey(uuid)) return;
         if (UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes()).equals(uuid)) {
@@ -48,9 +45,10 @@ public class SkullManager
             }
             JsonObject json = gson.fromJson(source.toString(), JsonObject.class);
             base64Meta.put(uuid, json.getAsJsonArray("properties").get(0).getAsJsonObject().get("value").getAsString());
-        } catch (Exception ex) {}
+        } catch (Exception ex) {
+        }
     }
-    
+
     public static void refreshTextureByDefaultMethod(UUID uuid, String name) {
         if (base64Meta.containsKey(uuid)) return;
         try {
@@ -68,9 +66,10 @@ public class SkullManager
             } else {
                 refreshTexture(uuid, name);
             }
-        } catch (Exception ex) {}
+        } catch (Exception ex) {
+        }
     }
-    
+
     private static ItemStack getDefaultHead() {
         if (!Bukkit.getBukkitVersion().startsWith("1.7") && !Bukkit.getBukkitVersion().startsWith("1.8") && !Bukkit.getBukkitVersion().startsWith("1.9") && !Bukkit.getBukkitVersion().startsWith("1.10") && !Bukkit.getBukkitVersion().startsWith("1.11") && !Bukkit.getBukkitVersion().startsWith("1.12")) {
             return new ItemStack(Material.PLAYER_HEAD);
@@ -78,7 +77,7 @@ public class SkullManager
             return new ItemStack(Material.getMaterial("SKULL_ITEM"), 1, (short) 3);
         }
     }
-    
+
     public static String getHeadTexturesFromHead(ItemStack headItem) {
         if (Bukkit.getBukkitVersion().startsWith("1.7") || headItem == null) return null;
         if (headItem.getItemMeta() instanceof SkullMeta) {
@@ -120,7 +119,7 @@ public class SkullManager
         }
         return null;
     }
-    
+
     public static ItemStack getHeadWithTextures(String textures) {
         ItemStack headItem = getDefaultHead();
         if (Bukkit.getBukkitVersion().startsWith("1.7") || textures == null) return headItem;
@@ -155,7 +154,7 @@ public class SkullManager
         headItem.setItemMeta(skull);
         return headItem;
     }
-    
+
     public static PropertyMap getProperties(GameProfile profile) {
         try {
             return profile.getProperties();
@@ -168,7 +167,7 @@ public class SkullManager
         }
         return null;
     }
-    
+
     public static GameProfile generateGameProfile(String textures) {
         try {
             GameProfile profile = new GameProfile(UUID.randomUUID(), "Skull");
@@ -180,11 +179,11 @@ public class SkullManager
                 map.put("textures", new Property("textures", textures));
                 PropertyMap propertyMap = PropertyMap.class.getConstructor(com.google.common.collect.Multimap.class).newInstance(map);
                 GameProfile profile = GameProfile.class.getConstructor(UUID.class, String.class, PropertyMap.class)
-                .newInstance(
-                    UUID.randomUUID(),
-                    "Skull",
-                    propertyMap
-                );
+                        .newInstance(
+                                UUID.randomUUID(),
+                                "Skull",
+                                propertyMap
+                        );
                 return profile;
             } catch (Exception ex) {
                 ex.printStackTrace();

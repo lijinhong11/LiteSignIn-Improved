@@ -2,8 +2,7 @@ package studio.trc.bukkit.litesignin.thread;
 
 import lombok.Getter;
 
-public class LiteSignInTask
-{
+public class LiteSignInTask {
     @Getter
     private final Runnable task;
     @Getter
@@ -30,7 +29,7 @@ public class LiteSignInTask
         this.tickInterval = tickInterval;
         this.onlyPlayersOnline = onlyPlayersOnline;
     }
-    
+
     public void run() {
         if (totalExecuteTimes != -1 || tickInterval > 0) {
             tickedTimes++;

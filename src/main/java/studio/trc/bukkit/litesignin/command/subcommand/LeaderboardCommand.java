@@ -1,17 +1,9 @@
 package studio.trc.bukkit.litesignin.command.subcommand;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
 import studio.trc.bukkit.litesignin.command.SignInSubCommand;
 import studio.trc.bukkit.litesignin.command.SignInSubCommandType;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
@@ -21,16 +13,19 @@ import studio.trc.bukkit.litesignin.message.MessageUtil;
 import studio.trc.bukkit.litesignin.queue.SignInQueue;
 import studio.trc.bukkit.litesignin.queue.SignInQueueElement;
 import studio.trc.bukkit.litesignin.thread.LiteSignInThread;
+import studio.trc.bukkit.litesignin.util.LiteSignInUtils;
 import studio.trc.bukkit.litesignin.util.PluginControl;
 import studio.trc.bukkit.litesignin.util.SignInDate;
-import studio.trc.bukkit.litesignin.util.LiteSignInUtils;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class LeaderboardCommand
-    implements SignInSubCommand
-{
+        implements SignInSubCommand {
     @Override
     public void execute(CommandSender sender, String subCommand, String... args) {
-        Runnable task = () -> {};
+        Runnable task = () -> {
+        };
         Map<String, String> placeholders = MessageUtil.getDefaultPlaceholders();
         SignInDate today = SignInDate.getInstance(new Date());
         if (args.length == 1) {
@@ -59,7 +54,8 @@ public class LeaderboardCommand
                     int numberOfSinglePage = 10;
                     try {
                         numberOfSinglePage = Integer.valueOf(MessageUtil.getMessage("Command-Messages.LeaderBoard.Number-Of-Single-Page"));
-                    } catch (NumberFormatException ex) {}
+                    } catch (NumberFormatException ex) {
+                    }
                     final int finalPage = page;
                     final int finalNumberOfSinglePage = numberOfSinglePage;
                     task = () -> sendLeaderBoard(sender, date, finalPage, finalNumberOfSinglePage);
@@ -68,7 +64,8 @@ public class LeaderboardCommand
                     int numberOfSinglePage = 10;
                     try {
                         numberOfSinglePage = Integer.valueOf(MessageUtil.getMessage("Command-Messages.LeaderBoard.Number-Of-Single-Page"));
-                    } catch (NumberFormatException ex) {}
+                    } catch (NumberFormatException ex) {
+                    }
                     final int finalPage = page;
                     final int finalNumberOfSinglePage = numberOfSinglePage;
                     task = () -> sendLeaderBoard(sender, date, finalPage, finalNumberOfSinglePage);
@@ -100,7 +97,8 @@ public class LeaderboardCommand
                     }
                     try {
                         numberOfSinglePage = Integer.valueOf(MessageUtil.getMessage("Command-Messages.LeaderBoard.Number-Of-Single-Page"));
-                    } catch (NumberFormatException ex) {}
+                    } catch (NumberFormatException ex) {
+                    }
                     final int finalPage = page;
                     final int finalNumberOfSinglePage = numberOfSinglePage;
                     task = () -> sendLeaderBoard(sender, date, finalPage, finalNumberOfSinglePage);
@@ -116,7 +114,8 @@ public class LeaderboardCommand
                     }
                     try {
                         numberOfSinglePage = Integer.valueOf(MessageUtil.getMessage("Command-Messages.LeaderBoard.Number-Of-Single-Page"));
-                    } catch (NumberFormatException ex) {}
+                    } catch (NumberFormatException ex) {
+                    }
                     final int finalPage = page;
                     final int finalNumberOfSinglePage = numberOfSinglePage;
                     task = () -> sendLeaderBoard(sender, date, finalPage, finalNumberOfSinglePage);
@@ -148,7 +147,7 @@ public class LeaderboardCommand
     public SignInSubCommandType getCommandType() {
         return SignInSubCommandType.LEADERBOARD;
     }
-    
+
     private void sendLeaderBoard(CommandSender sender, SignInDate date, int page, int numberOfSinglePage) {
         SignInQueue queue = SignInQueue.getInstance(date);
         if (queue.isEmpty()) {
@@ -176,8 +175,8 @@ public class LeaderboardCommand
         placeholders.put("{previousPage}", String.valueOf(page == 1 ? maxPage : page - 1));
         placeholders.put("{nextPage}", String.valueOf(page == maxPage ? 1 : page + 1));
         placeholders.put("{maxPage}", String.valueOf(maxPage));
-        for (String message : today ? 
-                MessageUtil.getMessageList("Command-Messages.LeaderBoard.LeaderBoard-Messages") : 
+        for (String message : today ?
+                MessageUtil.getMessageList("Command-Messages.LeaderBoard.LeaderBoard-Messages") :
                 MessageUtil.getMessageList("Command-Messages.LeaderBoard.Historical-Date-LeaderBoard-Messages")) {
             if (message.toLowerCase().contains("%leaderboard%")) {
                 for (int rank = page * numberOfSinglePage - numberOfSinglePage + 1; rank <= arraySize && rank <= page * numberOfSinglePage; rank++) {
@@ -199,10 +198,10 @@ public class LeaderboardCommand
                             if (name != null) {
                                 placeholders.put("{player}", name);
                                 JSONComponent component = new JSONComponent(
-                                    MessageUtil.replacePlaceholders(sender, MessageUtil.getMessage("Command-Messages.LeaderBoard.Player-Show.Text.Other-Players"), placeholders),
-                                    MessageUtil.getMessageList("Command-Messages.LeaderBoard.Player-Show.Hover").stream().map(line -> MessageUtil.replacePlaceholders(sender, line, placeholders)).collect(Collectors.toList()),
-                                    "RUN_COMMAND",
-                                    "/" + MessageUtil.replacePlaceholders(sender, MessageUtil.getMessage("Command-Messages.LeaderBoard.Player-Show.Command"), placeholders)
+                                        MessageUtil.replacePlaceholders(sender, MessageUtil.getMessage("Command-Messages.LeaderBoard.Player-Show.Text.Other-Players"), placeholders),
+                                        MessageUtil.getMessageList("Command-Messages.LeaderBoard.Player-Show.Hover").stream().map(line -> MessageUtil.replacePlaceholders(sender, line, placeholders)).collect(Collectors.toList()),
+                                        "RUN_COMMAND",
+                                        "/" + MessageUtil.replacePlaceholders(sender, MessageUtil.getMessage("Command-Messages.LeaderBoard.Player-Show.Command"), placeholders)
                                 );
                                 MessageUtil.sendCommandMessageWithJSONComponent(sender, "LeaderBoard.List-Format." + listFormatPath + ".Usually.Other-Players", placeholders, "%player%", component);
                             } else {
@@ -229,10 +228,10 @@ public class LeaderboardCommand
                                     Map<String, String> playerName = new HashMap();
                                     playerName.put("{player}", name);
                                     JSONComponent component = new JSONComponent(
-                                        MessageUtil.replacePlaceholders(sender, MessageUtil.getMessage("Command-Messages.LeaderBoard.Player-Show.Text.Other-Players"), playerName),
-                                        MessageUtil.getMessageList("Command-Messages.LeaderBoard.Player-Show.Hover").stream().map(line -> MessageUtil.replacePlaceholders(sender, line, playerName)).collect(Collectors.toList()),
-                                        "RUN_COMMAND",
-                                        "/" + MessageUtil.replacePlaceholders(sender, MessageUtil.getMessage("Command-Messages.LeaderBoard.Player-Show.Command"), playerName)
+                                            MessageUtil.replacePlaceholders(sender, MessageUtil.getMessage("Command-Messages.LeaderBoard.Player-Show.Text.Other-Players"), playerName),
+                                            MessageUtil.getMessageList("Command-Messages.LeaderBoard.Player-Show.Hover").stream().map(line -> MessageUtil.replacePlaceholders(sender, line, playerName)).collect(Collectors.toList()),
+                                            "RUN_COMMAND",
+                                            "/" + MessageUtil.replacePlaceholders(sender, MessageUtil.getMessage("Command-Messages.LeaderBoard.Player-Show.Command"), playerName)
                                     );
                                     MessageUtil.sendCommandMessageWithJSONComponent(sender, "LeaderBoard.List-Format." + listFormatPath + ".Tiel-Ranking.Other-Players", placeholders, "%player%", component);
                                 } else {
@@ -260,10 +259,10 @@ public class LeaderboardCommand
                             if (name != null) {
                                 placeholders.put("{player}", name);
                                 JSONComponent component = new JSONComponent(
-                                    MessageUtil.replacePlaceholders(sender, MessageUtil.getMessage("Command-Messages.LeaderBoard.Player-Show.Text.Self"), placeholders),
-                                    MessageUtil.getMessageList("Command-Messages.LeaderBoard.Player-Show.Hover").stream().map(line -> MessageUtil.replacePlaceholders(sender, line, placeholders)).collect(Collectors.toList()),
-                                    "RUN_COMMAND",
-                                    "/" + MessageUtil.replacePlaceholders(sender, MessageUtil.getMessage("Command-Messages.LeaderBoard.Player-Show.Command"), placeholders)
+                                        MessageUtil.replacePlaceholders(sender, MessageUtil.getMessage("Command-Messages.LeaderBoard.Player-Show.Text.Self"), placeholders),
+                                        MessageUtil.getMessageList("Command-Messages.LeaderBoard.Player-Show.Hover").stream().map(line -> MessageUtil.replacePlaceholders(sender, line, placeholders)).collect(Collectors.toList()),
+                                        "RUN_COMMAND",
+                                        "/" + MessageUtil.replacePlaceholders(sender, MessageUtil.getMessage("Command-Messages.LeaderBoard.Player-Show.Command"), placeholders)
                                 );
                                 MessageUtil.sendCommandMessageWithJSONComponent(sender, "LeaderBoard.List-Format." + listFormatPath + ".Usually.Self", placeholders, "%player%", component);
                             } else {
@@ -296,10 +295,10 @@ public class LeaderboardCommand
                                     Map<String, String> playerName = new HashMap();
                                     playerName.put("{player}", name);
                                     JSONComponent component = new JSONComponent(
-                                        MessageUtil.replacePlaceholders(sender, MessageUtil.getMessage("Command-Messages.LeaderBoard.Player-Show.Text." + target), playerName),
-                                        MessageUtil.getMessageList("Command-Messages.LeaderBoard.Player-Show.Hover").stream().map(line -> MessageUtil.replacePlaceholders(sender, line, playerName)).collect(Collectors.toList()),
-                                        "RUN_COMMAND",
-                                        "/" + MessageUtil.replacePlaceholders(sender, MessageUtil.getMessage("Command-Messages.LeaderBoard.Player-Show.Command"), playerName)
+                                            MessageUtil.replacePlaceholders(sender, MessageUtil.getMessage("Command-Messages.LeaderBoard.Player-Show.Text." + target), playerName),
+                                            MessageUtil.getMessageList("Command-Messages.LeaderBoard.Player-Show.Hover").stream().map(line -> MessageUtil.replacePlaceholders(sender, line, playerName)).collect(Collectors.toList()),
+                                            "RUN_COMMAND",
+                                            "/" + MessageUtil.replacePlaceholders(sender, MessageUtil.getMessage("Command-Messages.LeaderBoard.Player-Show.Command"), playerName)
                                     );
                                     MessageUtil.sendCommandMessageWithJSONComponent(sender, "LeaderBoard.List-Format." + listFormatPath + ".Tiel-Ranking." + target, placeholders, "%player%", component);
                                 } else {
@@ -316,16 +315,16 @@ public class LeaderboardCommand
             } else {
                 Map<String, JSONComponent> components = new HashMap<>();
                 components.put("%previousPage%", new JSONComponent(
-                    MessageUtil.getMessage("Command-Messages.LeaderBoard.Previous-Page.Text"), 
-                    MessageUtil.getMessageList("Command-Messages.LeaderBoard.Previous-Page.Hover"),
-                    "RUN_COMMAND",
-                    "/litesignin:signin leaderboard " + date.getDataText(false) + " " + (page - 1)
+                        MessageUtil.getMessage("Command-Messages.LeaderBoard.Previous-Page.Text"),
+                        MessageUtil.getMessageList("Command-Messages.LeaderBoard.Previous-Page.Hover"),
+                        "RUN_COMMAND",
+                        "/litesignin:signin leaderboard " + date.getDataText(false) + " " + (page - 1)
                 ));
                 components.put("%nextPage%", new JSONComponent(
-                    MessageUtil.getMessage("Command-Messages.LeaderBoard.Next-Page.Text"), 
-                    MessageUtil.getMessageList("Command-Messages.LeaderBoard.Next-Page.Hover"),
-                    "RUN_COMMAND",
-                    "/litesignin:signin leaderboard " + date.getDataText(false) + " " + (page + 1)
+                        MessageUtil.getMessage("Command-Messages.LeaderBoard.Next-Page.Text"),
+                        MessageUtil.getMessageList("Command-Messages.LeaderBoard.Next-Page.Hover"),
+                        "RUN_COMMAND",
+                        "/litesignin:signin leaderboard " + date.getDataText(false) + " " + (page + 1)
                 ));
                 MessageUtil.sendMixedMessage(sender, message, placeholders, components, placeholders);
             }

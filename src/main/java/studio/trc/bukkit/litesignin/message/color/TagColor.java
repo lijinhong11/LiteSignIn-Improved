@@ -1,21 +1,18 @@
 package studio.trc.bukkit.litesignin.message.color;
 
-import java.util.List;
-import java.util.Map;
-
 import lombok.Getter;
-
 import net.md_5.bungee.api.ChatColor;
-
 import studio.trc.bukkit.litesignin.message.tag.TagContentExtractor;
 import studio.trc.bukkit.litesignin.message.tag.TagContentInfo;
 
-public class TagColor 
-    implements FunctionalColor
-{
+import java.util.List;
+import java.util.Map;
+
+public class TagColor
+        implements FunctionalColor {
     @Getter
     private static final TagColor instance = new TagColor();
-    
+
     @Override
     public String coloring(String content) {
         Map<String, String> colorAndTypefaceNames = ColorUtils.getColorAndTypefaceNames();

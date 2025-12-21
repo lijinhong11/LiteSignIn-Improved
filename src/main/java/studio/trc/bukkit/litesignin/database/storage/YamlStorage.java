@@ -1,35 +1,5 @@
 package studio.trc.bukkit.litesignin.database.storage;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import studio.trc.bukkit.litesignin.api.Storage;
-import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
-import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
-import studio.trc.bukkit.litesignin.configuration.RobustConfiguration;
-import studio.trc.bukkit.litesignin.event.custom.PlayerSignInEvent;
-import studio.trc.bukkit.litesignin.event.custom.SignInRewardEvent;
-import studio.trc.bukkit.litesignin.util.PluginControl;
-import studio.trc.bukkit.litesignin.util.SignInDate;
-import studio.trc.bukkit.litesignin.util.LiteSignInUtils;
-import studio.trc.bukkit.litesignin.queue.SignInQueue;
-import studio.trc.bukkit.litesignin.reward.*;
-import studio.trc.bukkit.litesignin.reward.type.*;
-import studio.trc.bukkit.litesignin.reward.util.SignInGroup;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -38,73 +8,190 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import studio.trc.bukkit.litesignin.api.Storage;
+import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
+import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
+import studio.trc.bukkit.litesignin.configuration.RobustConfiguration;
+import studio.trc.bukkit.litesignin.event.custom.PlayerSignInEvent;
+import studio.trc.bukkit.litesignin.event.custom.SignInRewardEvent;
+import studio.trc.bukkit.litesignin.queue.SignInQueue;
+import studio.trc.bukkit.litesignin.reward.SignInRewardSchedule;
+import studio.trc.bukkit.litesignin.reward.type.*;
+import studio.trc.bukkit.litesignin.reward.util.SignInGroup;
+import studio.trc.bukkit.litesignin.util.LiteSignInUtils;
+import studio.trc.bukkit.litesignin.util.PluginControl;
+import studio.trc.bukkit.litesignin.util.SignInDate;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public final class YamlStorage
-    implements Storage
-{
+        implements Storage {
     public static final Map<UUID, YamlStorage> cache = new HashMap();
-    
+
     private final UUID uuid;
     private final FileConfiguration config = new YamlConfiguration();
     private boolean loaded = false;
-    
+
     public YamlStorage(Player player) {
         uuid = player.getUniqueId();
-        
+
         File dataFolder = new File("plugins/LiteSignIn/Players");
         if (!dataFolder.exists()) {
             dataFolder.mkdir();
         }
-        
-        File dataFile = new File("plugins/LiteSignIn/Players/" + uuid.toString() + ".yml");
+
+        File dataFile = new File("plugins/LiteSignIn/Players/" + uuid + ".yml");
         if (!dataFile.exists()) {
             try {
                 dataFile.createNewFile();
-            } catch (IOException ex) {}
+            } catch (IOException ex) {
+            }
         }
-        try (InputStreamReader Config = new InputStreamReader(new FileInputStream(dataFile), "UTF-8")) {
+        try (InputStreamReader Config = new InputStreamReader(new FileInputStream(dataFile), StandardCharsets.UTF_8)) {
             config.load(Config);
         } catch (IOException | InvalidConfigurationException ex) {
             dataFileRepair();
         }
         config.set("Name", player.getName());
-        
+
         checkContinuousSignIn();
         loaded = true;
     }
-    
+
     public YamlStorage(UUID uuid) {
         this.uuid = uuid;
-        
+
         File dataFolder = new File("plugins/LiteSignIn/Players");
         if (!dataFolder.exists()) {
             dataFolder.mkdir();
         }
-        
+
         File dataFile = new File("plugins/LiteSignIn/Players/" + uuid.toString() + ".yml");
         if (!dataFile.exists()) {
             try {
                 dataFile.createNewFile();
-            } catch (IOException ex) {}
+            } catch (IOException ex) {
+            }
         }
-        try (InputStreamReader Config = new InputStreamReader(new FileInputStream(dataFile), "UTF-8")) {
+        try (InputStreamReader Config = new InputStreamReader(new FileInputStream(dataFile), StandardCharsets.UTF_8)) {
             config.load(Config);
         } catch (IOException | InvalidConfigurationException ex) {
             dataFileRepair();
         }
         config.set("Name", Bukkit.getOfflinePlayer(uuid).getName());
-        
+
         checkContinuousSignIn();
         loaded = true;
     }
-    
+
+    public static YamlStorage getPlayerData(Player player) {
+        YamlStorage data = cache.get(player.getUniqueId());
+        if (data != null) {
+            return data;
+        }
+        data = new YamlStorage(player);
+        cache.put(player.getUniqueId(), data);
+        return data;
+    }
+
+    public static YamlStorage getPlayerData(UUID uuid) {
+        YamlStorage data = cache.get(uuid);
+        if (data != null) {
+            return data;
+        }
+        data = new YamlStorage(uuid);
+        cache.put(uuid, data);
+        return data;
+    }
+
+    /**
+     * Back up all player data.
+     *
+     * @param filePath Backup file path.
+     * @throws java.sql.SQLException
+     */
+    public static void backup(String filePath) throws SQLException {
+        try (Connection sqlConnection = DriverManager.getConnection("jdbc:sqlite:" + filePath)) {
+            sqlConnection.prepareStatement("CREATE TABLE IF NOT EXISTS PlayerData("
+                    + "UUID VARCHAR(36) NOT NULL,"
+                    + " Name VARCHAR(16),"
+                    + " Year INT,"
+                    + " Month INT,"
+                    + " Day INT,"
+                    + " Hour INT,"
+                    + " Minute INT,"
+                    + " Second INT,"
+                    + " Continuous INT,"
+                    + " RetroactiveCard INT,"
+                    + " History LONGTEXT,"
+                    + " PRIMARY KEY (UUID))").executeUpdate();
+            File playerFolder = new File("plugins/LiteSignIn/Players");
+            if (playerFolder.exists()) {
+                File[] dataFiles = playerFolder.listFiles();
+                for (File dataFile : dataFiles) {
+                    if (dataFile.getName().endsWith(".yml")) {
+                        YamlConfiguration yaml = new YamlConfiguration();
+                        try {
+                            yaml.load(dataFile);
+                        } catch (IOException | InvalidConfigurationException ex) {
+                            continue;
+                        }
+                        String uuid = dataFile.getName().replace(".yml", "");
+                        String name = yaml.getString("Name");
+                        int year = yaml.getInt("Last-time-SignIn.Year");
+                        int month = yaml.getInt("Last-time-SignIn.Month");
+                        int day = yaml.getInt("Last-time-SignIn.Day");
+                        int hour = yaml.getInt("Last-time-SignIn.Hour");
+                        int minute = yaml.getInt("Last-time-SignIn.Minute");
+                        int second = yaml.getInt("Last-time-SignIn.Second");
+                        int continuous = yaml.getInt("Continuous-SignIn");
+                        int retroactivecard = yaml.getInt("RetroactiveCard");
+                        String history = yaml.getStringList("History").toString().substring(1, yaml.getStringList("History").toString().length() - 1);
+                        if (name == null) {
+                            name = "null";
+                        }
+                        if (history == null) {
+                            history = "";
+                        }
+                        try (PreparedStatement statement = sqlConnection.prepareStatement("INSERT INTO PlayerData(UUID, Name, Year, Month, Day, Hour, Minute, Second, Continuous, RetroactiveCard, History)"
+                                + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+                            statement.setString(1, uuid);
+                            statement.setString(2, name);
+                            statement.setInt(3, year);
+                            statement.setInt(4, month);
+                            statement.setInt(5, day);
+                            statement.setInt(6, hour);
+                            statement.setInt(7, minute);
+                            statement.setInt(8, second);
+                            statement.setInt(9, continuous);
+                            statement.setInt(10, retroactivecard);
+                            statement.setString(11, history);
+                            statement.executeUpdate();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     public void checkContinuousSignIn() {
         String[] date = new SimpleDateFormat("yyyy-MM-dd").format(new Date()).split("-");
         int year = getYear();
         int month = getMonth();
         int day = getDay();
-        if (Integer.valueOf(date[0]) == year && Integer.valueOf(date[1]) == month && Integer.valueOf(date[2]) == day) return;
+        if (Integer.valueOf(date[0]) == year && Integer.valueOf(date[1]) == month && Integer.valueOf(date[2]) == day)
+            return;
         boolean breakSign = true;
         if (year == Integer.valueOf(date[0])) {
             int[] days = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
@@ -125,7 +212,7 @@ public final class YamlStorage
             setContinuousSignIn(0, true);
         }
     }
-    
+
     @Override
     public void giveReward(SignInDate retroactiveDate) {
         Player player = Bukkit.getPlayer(uuid);
@@ -199,7 +286,7 @@ public final class YamlStorage
             rewardQueue.run(retroactiveDate != null);
         }
     }
-    
+
     @Override
     public SignInGroup getGroup() {
         Player player = Bukkit.getPlayer(uuid);
@@ -227,54 +314,54 @@ public final class YamlStorage
         List<SignInGroup> groups = new ArrayList<>();
         RobustConfiguration rewardSettings = ConfigurationUtil.getConfig(ConfigurationType.REWARD_SETTINGS);
         rewardSettings.getStringList("Reward-Settings.Groups-Priority").stream()
-            .filter(group -> group.equalsIgnoreCase("Default") || (rewardSettings.get("Reward-Settings.Permission-Groups." + group + ".Permission") != null && player.hasPermission(rewardSettings.getString("Reward-Settings.Permission-Groups." + group + ".Permission"))))
-            .forEach(group -> groups.add(new SignInGroup(group)));
+                .filter(group -> group.equalsIgnoreCase("Default") || (rewardSettings.get("Reward-Settings.Permission-Groups." + group + ".Permission") != null && player.hasPermission(rewardSettings.getString("Reward-Settings.Permission-Groups." + group + ".Permission"))))
+                .forEach(group -> groups.add(new SignInGroup(group)));
         if (groups.isEmpty() && rewardSettings.get("Reward-Settings.Permission-Groups.Default") != null) {
             groups.add(new SignInGroup("Default"));
         }
         return groups;
     }
-    
+
     @Override
     public String getName() {
         return config.contains("Name") ? config.getString("Name") : Bukkit.getOfflinePlayer(uuid).getName();
     }
-    
+
     @Override
     public int getYear() {
         return config.get("Last-time-SignIn.Year") != null ? config.getInt("Last-time-SignIn.Year") : 1970;
     }
-    
+
     @Override
     public int getMonth() {
         return config.get("Last-time-SignIn.Month") != null ? config.getInt("Last-time-SignIn.Month") : 1;
     }
-    
+
     @Override
     public int getDay() {
         return config.get("Last-time-SignIn.Day") != null ? config.getInt("Last-time-SignIn.Day") : 1;
     }
-    
+
     @Override
     public int getHour() {
         return config.get("Last-time-SignIn.Hour") != null ? config.getInt("Last-time-SignIn.Hour") : 0;
     }
-    
+
     @Override
     public int getMinute() {
         return config.get("Last-time-SignIn.Minute") != null ? config.getInt("Last-time-SignIn.Minute") : 0;
     }
-    
+
     @Override
     public int getSecond() {
         return config.get("Last-time-SignIn.Second") != null ? config.getInt("Last-time-SignIn.Second") : 0;
     }
-    
+
     @Override
     public int getContinuousSignIn() {
         return config.get("Continuous-SignIn") != null ? config.getInt("Continuous-SignIn") : 0;
     }
-    
+
     @Override
     public int getRetroactiveCard() {
         if (PluginControl.enableRetroactiveCardRequiredItem()) {
@@ -295,27 +382,27 @@ public final class YamlStorage
         }
         return config.get("RetroactiveCard") != null ? config.getInt("RetroactiveCard") : 0;
     }
-    
+
     @Override
     public int getCumulativeNumber() {
         return clearUselessData(getHistory()).size();
     }
-    
+
     @Override
     public int getContinuousSignInOfMonth() {
         return SignInDate.getContinuousOfMonth(getHistory());
     }
-    
+
     @Override
     public int getCumulativeNumberOfMonth(int year, int month) {
         return clearUselessData(getHistory()).stream().filter(record -> record.getYear() == year && record.getMonth() == month).toArray().length;
     }
-    
+
     @Override
     public UUID getUserUUID() {
         return uuid;
     }
-    
+
     @Override
     public Player getPlayer() {
         return Bukkit.getPlayer(uuid);
@@ -331,7 +418,7 @@ public final class YamlStorage
         }
         return history;
     }
-    
+
     @Override
     public boolean alreadySignIn() {
         return getHistory().stream().anyMatch(date -> date.equals(SignInDate.getInstance(new Date())));
@@ -355,7 +442,7 @@ public final class YamlStorage
         });
         return result;
     }
-    
+
     @Override
     public void setHistory(List<SignInDate> history, boolean saveData) {
         List<String> data = new ArrayList<>();
@@ -365,7 +452,7 @@ public final class YamlStorage
         config.set("History", data);
         if (saveData) saveData();
     }
-    
+
     @Override
     public void signIn() {
         if (LiteSignInUtils.checkInDisabledWorlds(uuid)) return;
@@ -382,7 +469,7 @@ public final class YamlStorage
         setContinuousSignIn(SignInDate.getContinuous(history), true);
         giveReward(null);
     }
-    
+
     @Override
     public void signIn(SignInDate historicalDate) {
         if (LiteSignInUtils.checkInDisabledWorlds(uuid)) return;
@@ -421,7 +508,7 @@ public final class YamlStorage
         giveReward(historicalDate);
         lastSignInTime.put(uuid, System.currentTimeMillis());
     }
-    
+
     @Override
     public void giveRetroactiveCard(int amount) {
         if (amount < 1) return;
@@ -472,7 +559,7 @@ public final class YamlStorage
             setRetroactiveCard(getRetroactiveCard() - amount, true);
         }
     }
-    
+
     @Override
     public void setRetroactiveCard(int amount, boolean saveData) {
         if (PluginControl.enableRetroactiveCardRequiredItem()) {
@@ -500,7 +587,7 @@ public final class YamlStorage
             if (saveData) saveData();
         }
     }
-    
+
     @Override
     public void setSignInTime(SignInDate date, boolean saveData) {
         config.set("Last-time-SignIn.Year", date.getYear());
@@ -512,123 +599,37 @@ public final class YamlStorage
         SignInQueue.getInstance().addRecord(uuid, date);
         if (saveData) saveData();
     }
-    
+
     @Override
     public void setContinuousSignIn(int number, boolean saveData) {
         config.set("Continuous-SignIn", number);
         if (saveData) saveData();
     }
-    
+
     @Override
     public void saveData() {
         if (loaded) {
             try {
                 config.save("plugins/LiteSignIn/Players/" + uuid + ".yml");
-            } catch (IOException ex) {}
+            } catch (IOException ex) {
+            }
         }
     }
-    
+
     private void dataFileRepair() {
         File dataFolder = new File("plugins/LiteSignIn/Broken-Players");
         if (!dataFolder.exists()) {
             dataFolder.mkdir();
         }
         File dataFile = new File("plugins/LiteSignIn/Players/" + uuid.toString() + ".yml");
-        dataFile.renameTo(new File("plugins/LiteSignIn/Broken-Players/" + uuid.toString() + ".yml"));
+        dataFile.renameTo(new File("plugins/LiteSignIn/Broken-Players/" + uuid + ".yml"));
         try {
             dataFile.createNewFile();
-        } catch (IOException ex) {}
-        try (InputStreamReader Config = new InputStreamReader(new FileInputStream(dataFile), "UTF-8")) {
+        } catch (IOException ex) {
+        }
+        try (InputStreamReader Config = new InputStreamReader(new FileInputStream(dataFile), StandardCharsets.UTF_8)) {
             config.load(Config);
-        } catch (IOException | InvalidConfigurationException ex) {}
-    }
-    
-    public static YamlStorage getPlayerData(Player player) {
-        YamlStorage data = cache.get(player.getUniqueId());
-        if (data != null) {
-            return data;
-        }
-        data = new YamlStorage(player);
-        cache.put(player.getUniqueId(), data);
-        return data;
-    }
-    
-    public static YamlStorage getPlayerData(UUID uuid) {
-        YamlStorage data = cache.get(uuid);
-        if (data != null) {
-            return data;
-        }
-        data = new YamlStorage(uuid);
-        cache.put(uuid, data);
-        return data;
-    }
-    
-    /**
-     * Back up all player data.
-     * @param filePath Backup file path. 
-     * @throws java.sql.SQLException 
-     */
-    public static void backup(String filePath) throws SQLException {
-        try (Connection sqlConnection = DriverManager.getConnection("jdbc:sqlite:" + filePath)) {
-            sqlConnection.prepareStatement("CREATE TABLE IF NOT EXISTS PlayerData("
-                    + "UUID VARCHAR(36) NOT NULL,"
-                    + " Name VARCHAR(16),"
-                    + " Year INT,"
-                    + " Month INT,"
-                    + " Day INT,"
-                    + " Hour INT,"
-                    + " Minute INT,"
-                    + " Second INT,"
-                    + " Continuous INT,"
-                    + " RetroactiveCard INT,"
-                    + " History LONGTEXT,"
-                    + " PRIMARY KEY (UUID))").executeUpdate();
-            File playerFolder = new File("plugins/LiteSignIn/Players");
-            if (playerFolder.exists()) {
-                File[] dataFiles = playerFolder.listFiles();
-                for (File dataFile : dataFiles) {
-                    if (dataFile.getName().endsWith(".yml")) {
-                        YamlConfiguration yaml = new YamlConfiguration();
-                        try {
-                            yaml.load(dataFile);
-                        } catch (IOException | InvalidConfigurationException ex) {
-                            continue;
-                        }
-                        String uuid = dataFile.getName().replace(".yml", "");
-                        String name = yaml.getString("Name");
-                        int year = yaml.getInt("Last-time-SignIn.Year");
-                        int month = yaml.getInt("Last-time-SignIn.Month");
-                        int day = yaml.getInt("Last-time-SignIn.Day");
-                        int hour = yaml.getInt("Last-time-SignIn.Hour");
-                        int minute = yaml.getInt("Last-time-SignIn.Minute");
-                        int second = yaml.getInt("Last-time-SignIn.Second");
-                        int continuous = yaml.getInt("Continuous-SignIn");
-                        int retroactivecard = yaml.getInt("RetroactiveCard");
-                        String history = yaml.getStringList("History").toString().substring(1, yaml.getStringList("History").toString().length() - 1);
-                        if (name == null) {
-                            name = "null";
-                        }
-                        if (history == null) {
-                            history = "";
-                        }
-                        try (PreparedStatement statement = sqlConnection.prepareStatement("INSERT INTO PlayerData(UUID, Name, Year, Month, Day, Hour, Minute, Second, Continuous, RetroactiveCard, History)"
-                                + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
-                            statement.setString(1, uuid);
-                            statement.setString(2, name);
-                            statement.setInt(3, year);
-                            statement.setInt(4, month);
-                            statement.setInt(5, day);
-                            statement.setInt(6, hour);
-                            statement.setInt(7, minute);
-                            statement.setInt(8, second);
-                            statement.setInt(9, continuous);
-                            statement.setInt(10, retroactivecard);
-                            statement.setString(11, history);
-                            statement.executeUpdate();
-                        }
-                    }
-                }
-            }
+        } catch (IOException | InvalidConfigurationException ex) {
         }
     }
 }

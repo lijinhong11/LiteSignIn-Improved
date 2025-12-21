@@ -4,14 +4,13 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 public class AdvancedPie
-    extends CustomChart
-{
+        extends CustomChart {
     private final Callable<Map<String, Integer>> callable;
 
     /**
      * Class constructor.
      *
-     * @param chartId The id of the chart.
+     * @param chartId  The id of the chart.
      * @param callable The callable which is used to request the chart data.
      */
     public AdvancedPie(String chartId, Callable<Map<String, Integer>> callable) {
@@ -29,12 +28,12 @@ public class AdvancedPie
         }
         boolean allSkipped = true;
         for (Map.Entry<String, Integer> entry : map.entrySet()) {
-        if (entry.getValue() == 0) {
-            // Skip this invalid
-           continue;
-        }
-        allSkipped = false;
-        valuesBuilder.appendField(entry.getKey(), entry.getValue());
+            if (entry.getValue() == 0) {
+                // Skip this invalid
+                continue;
+            }
+            allSkipped = false;
+            valuesBuilder.appendField(entry.getKey(), entry.getValue());
         }
         if (allSkipped) {
             // Null = skip the chart

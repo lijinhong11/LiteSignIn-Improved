@@ -4,14 +4,13 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 public class MultiLineChart
-    extends CustomChart
-{
+        extends CustomChart {
     private final Callable<Map<String, Integer>> callable;
 
     /**
      * Class constructor.
      *
-     * @param chartId The id of the chart.
+     * @param chartId  The id of the chart.
      * @param callable The callable which is used to request the chart data.
      */
     public MultiLineChart(String chartId, Callable<Map<String, Integer>> callable) {

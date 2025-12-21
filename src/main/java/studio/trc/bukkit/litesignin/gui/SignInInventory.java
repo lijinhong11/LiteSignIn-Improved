@@ -1,18 +1,17 @@
 package studio.trc.bukkit.litesignin.gui;
 
+import org.bukkit.inventory.Inventory;
+import studio.trc.bukkit.litesignin.util.SignInDate;
+
 import java.util.Date;
 import java.util.List;
 
-import org.bukkit.inventory.Inventory;
-
-import studio.trc.bukkit.litesignin.util.SignInDate;
-
 /**
  * The Sign-in gui.
+ *
  * @author Dean
  */
-public class SignInInventory
-{
+public class SignInInventory {
     private final int month;
     private final int year;
     private final Inventory inv;
@@ -47,7 +46,7 @@ public class SignInInventory
     public int getYear() {
         return year;
     }
-    
+
     public int getNextPageMonth() {
         if (month == 12) {
             return 1;
@@ -55,14 +54,14 @@ public class SignInInventory
             return month + 1;
         }
     }
-    
+
     public int getNextPageYear() {
         if (month != 12) {
             return year;
         }
         return year + 1;
     }
-    
+
     public int getPreviousPageMonth() {
         if (month == 1) {
             return 12;
@@ -70,7 +69,7 @@ public class SignInInventory
             return month - 1;
         }
     }
-    
+
     public int getPreviousPageYear() {
         if (month != 1) {
             return year;

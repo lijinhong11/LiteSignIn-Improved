@@ -1,35 +1,28 @@
 package studio.trc.bukkit.litesignin.command.subcommand;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import lombok.Getter;
-
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
 import studio.trc.bukkit.litesignin.command.SignInSubCommand;
 import studio.trc.bukkit.litesignin.command.SignInSubCommandType;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
-import studio.trc.bukkit.litesignin.message.MessageUtil;
 import studio.trc.bukkit.litesignin.database.util.BackupUtil;
 import studio.trc.bukkit.litesignin.database.util.RollBackUtil;
 import studio.trc.bukkit.litesignin.message.JSONComponent;
-import studio.trc.bukkit.litesignin.util.PluginControl;
+import studio.trc.bukkit.litesignin.message.MessageUtil;
 import studio.trc.bukkit.litesignin.util.LiteSignInUtils;
+import studio.trc.bukkit.litesignin.util.PluginControl;
+
+import java.io.File;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class DatabaseCommand
-    implements SignInSubCommand
-{
+        implements SignInSubCommand {
     private final Map<CommandSender, Confirm> confirmCache = new HashMap();
-    
+
     @Override
     public void execute(CommandSender sender, String subCommand, String... args) {
         if (args.length == 1) {
@@ -149,48 +142,48 @@ public class DatabaseCommand
             MessageUtil.sendCommandMessage(sender, "Database.Confirm.Invalid-Operation");
         }
     }
-    
+
     public enum SubCommandType {
         /**
          * /signin database backup
          */
         BACKUP("backup", "Database.Backup"),
-        
+
         /**
          * /signin database roolback
          */
         ROLLBACK("rollback", "Database.Rollback"),
-        
+
         /**
          * /signin database confirm
          */
         CONFIRM("confirm", "Database");
-        
+
         @Getter
         private final String commandName;
         @Getter
         private final String commandPermissionPath;
-        
-        private SubCommandType(String commandName, String commandPermissionPath) {
+
+        SubCommandType(String commandName, String commandPermissionPath) {
             this.commandName = commandName;
             this.commandPermissionPath = commandPermissionPath;
         }
     }
-    
+
     private enum Confirm {
-        
+
         BACKUP,
-        
+
         ROLLBACK;
-        
+
         private File file = null;
-        
-        public void setTargetFile(File file) {
-            this.file = file;
-        }
-        
+
         public File getTargetFile() {
             return file;
+        }
+
+        public void setTargetFile(File file) {
+            this.file = file;
         }
     }
 }

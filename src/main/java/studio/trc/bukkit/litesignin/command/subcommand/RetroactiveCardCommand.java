@@ -1,28 +1,25 @@
 package studio.trc.bukkit.litesignin.command.subcommand;
 
+import lombok.Getter;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import studio.trc.bukkit.litesignin.api.Storage;
+import studio.trc.bukkit.litesignin.command.SignInSubCommand;
+import studio.trc.bukkit.litesignin.command.SignInSubCommandType;
+import studio.trc.bukkit.litesignin.message.MessageUtil;
+import studio.trc.bukkit.litesignin.util.LiteSignInUtils;
+import studio.trc.bukkit.litesignin.util.PluginControl;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import lombok.Getter;
-
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
-import studio.trc.bukkit.litesignin.api.Storage;
-import studio.trc.bukkit.litesignin.command.SignInSubCommand;
-import studio.trc.bukkit.litesignin.command.SignInSubCommandType;
-import studio.trc.bukkit.litesignin.message.MessageUtil;
-import studio.trc.bukkit.litesignin.util.PluginControl;
-import studio.trc.bukkit.litesignin.util.LiteSignInUtils;
-
 public class RetroactiveCardCommand
-    implements SignInSubCommand
-{
+        implements SignInSubCommand {
     @Override
     public void execute(CommandSender sender, String subCommand, String... args) {
         if (!PluginControl.enableRetroactiveCard()) {
@@ -212,29 +209,29 @@ public class RetroactiveCardCommand
             MessageUtil.sendCommandMessage(sender, "RetroactiveCard.Invalid-Number", placeholders);
         }
     }
-    
+
     public enum SubCommandType {
         /**
          * /signin retroactivecard give
          */
         GIVE("give", "RetroactiveCard.Give"),
-        
+
         /**
          * /signin retroactivecard set
          */
         SET("set", "RetroactiveCard.Set"),
-        
+
         /**
          * /signin retroactivecard set
          */
         TAKE("take", "RetroactiveCard.Take");
-        
+
         @Getter
         private final String commandName;
         @Getter
         private final String commandPermissionPath;
-        
-        private SubCommandType(String commandName, String commandPermissionPath) {
+
+        SubCommandType(String commandName, String commandPermissionPath) {
             this.commandName = commandName;
             this.commandPermissionPath = commandPermissionPath;
         }
