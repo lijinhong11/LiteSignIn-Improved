@@ -1,7 +1,7 @@
 package studio.trc.bukkit.litesignin.message;
 
 import lombok.Getter;
-import net.md_5.bungee.api.chat.BaseComponent;
+import net.kyori.adventure.text.Component;
 
 public class MessageSection {
     @Getter
@@ -9,9 +9,7 @@ public class MessageSection {
     @Getter
     private final int endsWith;
     @Getter
-    private final BaseComponent bungeeComponent;
-    @Getter
-    private final Object adventureComponent;
+    private final Component adventureComponent;
     @Getter
     private final String text;
     @Getter
@@ -22,26 +20,15 @@ public class MessageSection {
         this.startsWith = startsWith;
         this.endsWith = endsWith;
         this.placeholder = placeholder;
-        bungeeComponent = null;
         adventureComponent = null;
     }
 
-    public MessageSection(BaseComponent bungeeComponent, String placeholder, int startsWith, int endsWith) {
-        this.startsWith = startsWith;
-        this.endsWith = endsWith;
-        this.placeholder = placeholder;
-        this.bungeeComponent = bungeeComponent;
-        text = null;
-        adventureComponent = null;
-    }
-
-    public MessageSection(Object adventureComponent, String placeholder, int startsWith, int endsWith) {
+    public MessageSection(Component adventureComponent, String placeholder, int startsWith, int endsWith) {
         this.startsWith = startsWith;
         this.endsWith = endsWith;
         this.placeholder = placeholder;
         this.adventureComponent = adventureComponent;
         text = null;
-        bungeeComponent = null;
     }
 
     public boolean isPlaceholder() {

@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * Used to avoid serious errors caused by the absence of AdventureAPI when JVM loads classes in low version or non AdventureAPI servers.
  */
 public class AdventureUtils {
-    public static Component setHoverEvent(Component component, HoverEvent event) {
+    public static Component setHoverEvent(Component component, HoverEvent<?> event) {
         return component.hoverEvent(event);
     }
 
@@ -35,36 +35,26 @@ public class AdventureUtils {
         return components.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, value -> toComponent(value.getValue())));
     }
 
-    public static HoverEvent showText(String text) {
+    public static HoverEvent<Component> showText(String text) {
         return HoverEvent.showText(AdventureUtils.serializeText(text));
     }
 
     public static ClickEvent getClickEvent(String action, String text) {
-        switch (action.toUpperCase()) {
-            case "SUGGEST_COMMAND": {
-                return ClickEvent.suggestCommand(text);
-            }
-            case "RUN_COMMAND": {
-                return ClickEvent.runCommand(text);
-            }
-            case "OPEN_URL": {
-                return ClickEvent.openUrl(text);
-            }
-            case "COPY_TO_CLIPBOARD": {
-                return ClickEvent.copyToClipboard(text);
-            }
-            case "OPEN_FILE": {
-                return ClickEvent.openFile(text);
-            }
-        }
-        return null;
+        return switch (action.toUpperCase()) {
+            case "SUGGEST_COMMAND" -> ClickEvent.suggestCommand(text);
+            case "RUN_COMMAND" -> ClickEvent.runCommand(text);
+            case "OPEN_URL" -> ClickEvent.openUrl(text);
+            case "COPY_TO_CLIPBOARD" -> ClickEvent.copyToClipboard(text);
+            case "OPEN_FILE" -> ClickEvent.openFile(text);
+            default -> null;
+        };
     }
 
     public static Map<String, Object> getItemDisplay(List<CustomItem> itemList) {
         Map<String, Object> json = new HashMap<>();
         Component component = Component.text("");
         for (int i = 0; i < itemList.size(); i++) {
-            component = component.append(AdventureUtils.toComponent(NMSManager.getAdventureJSONItemStack(itemList.get(i).getItemStack())));
+            component = component.append(AdventureUtils.toComponent(NMSManager.getAdventureJSONItemStack(itemList.get(i).itemStack())));
             if (i != itemList.size() - 1) {
                 component = component.append(Component.text(", "));
             }

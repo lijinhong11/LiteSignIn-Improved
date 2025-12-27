@@ -54,7 +54,7 @@ public class TransitionColor
             String[] colorList = tagContent.getAttribute().split(":", -1);
             String text = tagContent.getContent();
             if (colorList.length >= 2 && LiteSignInUtils.isFloat(colorList[colorList.length - 1])) {
-                float ratio = Float.valueOf(colorList[colorList.length - 1]);
+                float ratio = Float.parseFloat(colorList[colorList.length - 1]);
                 String[] colors = new String[colorList.length - 1];
                 System.arraycopy(colorList, 0, colors, 0, colorList.length - 1);
                 content = tagContent.replace(content, (tagContent.getCloseTag() != null ? "<previousColor>" : "") + makeTransition(colors, ratio) + ColorUtils.getPreviousTypeface(original, tagContent.getStartPosition()) + text + (tagContent.getCloseTag() != null ? "</previousColor>" : ""));

@@ -9,14 +9,9 @@ public enum DatabaseType {
     MYSQL;
 
     public static String getTableSyntax(DatabaseType type) {
-        switch (type) {
-            case MYSQL: {
-                return MySQLEngine.getInstance().getTableSyntax(DatabaseTable.PLAYER_DATA);
-            }
-            case SQLITE: {
-                return SQLiteEngine.getInstance().getTableSyntax(DatabaseTable.PLAYER_DATA);
-            }
-        }
-        return null;
+        return switch (type) {
+            case MYSQL -> MySQLEngine.getInstance().getTableSyntax(DatabaseTable.PLAYER_DATA);
+            case SQLITE -> SQLiteEngine.getInstance().getTableSyntax(DatabaseTable.PLAYER_DATA);
+        };
     }
 }

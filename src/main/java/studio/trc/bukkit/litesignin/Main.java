@@ -1,5 +1,6 @@
 package studio.trc.bukkit.litesignin;
 
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.PluginManager;
@@ -36,21 +37,16 @@ public class Main
      * Main instance
      */
     private static Main main;
+    @Getter
     private static Metrics metrics;
 
     public static Main getInstance() {
         return main;
     }
 
-    public static Metrics getMetrics() {
-        return metrics;
-    }
-
     @Override
     public void onEnable() {
         main = this;
-
-        LiteSignInProperties.reloadProperties();
 
         if (!getDescription().getName().equals("LiteSignIn")) {
             LiteSignInProperties.sendOperationMessage("PluginNameChange");
@@ -71,7 +67,7 @@ public class Main
             }
             if (!MessageUtil.useAdventure()) {
                 try {
-                    if (Integer.valueOf(Bukkit.getBukkitVersion().split("\\.")[1]) > 19) {
+                    if (Integer.parseInt(Bukkit.getBukkitVersion().split("\\.")[1]) > 19) {
                         LiteSignInProperties.sendOperationMessage("UnsupportedCore", MessageUtil.getDefaultPlaceholders());
                     }
                 } catch (Throwable ex) {
@@ -91,9 +87,9 @@ public class Main
         LiteSignInThread.getTaskThread().setRunning(false);
         LiteSignInProperties.sendOperationMessage("AsyncThreadStopped", MessageUtil.getDefaultPlaceholders());
         if (PluginControl.useMySQLStorage()) {
-            MySQLStorage.cache.values().stream().forEach(MySQLStorage::saveData);
+            MySQLStorage.cache.values().forEach(MySQLStorage::saveData);
         } else if (PluginControl.useSQLiteStorage()) {
-            SQLiteStorage.cache.values().stream().forEach(SQLiteStorage::saveData);
+            SQLiteStorage.cache.values().forEach(SQLiteStorage::saveData);
         }
         if (ConfigurationUtil.getConfig(ConfigurationType.CONFIG).getBoolean("Database-Management.Backup.Auto-Backup")) {
             MessageUtil.sendMessage(getServer().getConsoleSender(), "Database-Management.Backup.Auto-Backup");

@@ -28,7 +28,7 @@ import java.util.Map;
 
 public class WoodSignUtil {
     private static final List<WoodSign> scripts = new ArrayList<>();
-    private static final Map<Location, WoodSign> scriptedSigns = new HashMap();
+    private static final Map<Location, WoodSign> scriptedSigns = new HashMap<>();
     private static final FileConfiguration database = new YamlConfiguration();
 
     public static void loadSigns() {
@@ -72,23 +72,22 @@ public class WoodSignUtil {
         scripts.clear();
         ConfigurationUtil.reloadConfig(ConfigurationType.WOOD_SIGN_SETTINGS);
         RobustConfiguration config = ConfigurationUtil.getConfig(ConfigurationType.WOOD_SIGN_SETTINGS);
-        config.getConfigurationSection("Wood-Sign-Scripts").getKeys(false).stream().forEach(sections -> {
+        config.getConfigurationSection("Wood-Sign-Scripts").getKeys(false).forEach(woodSignTitle -> {
             try {
-                String woodSignTitle = sections;
                 WoodSignLine woodSignText = WoodSignLine.create()
-                        .setLine1(config.getString("Wood-Sign-Scripts." + sections + ".Sign-Text.Line-1"))
-                        .setLine2(config.getString("Wood-Sign-Scripts." + sections + ".Sign-Text.Line-2"))
-                        .setLine3(config.getString("Wood-Sign-Scripts." + sections + ".Sign-Text.Line-3"))
-                        .setLine4(config.getString("Wood-Sign-Scripts." + sections + ".Sign-Text.Line-4"));
-                List<String> woodSignCommand = config.getStringList("Wood-Sign-Scripts." + sections + ".Commands");
+                        .setLine1(config.getString("Wood-Sign-Scripts." + woodSignTitle + ".Sign-Text.Line-1"))
+                        .setLine2(config.getString("Wood-Sign-Scripts." + woodSignTitle + ".Sign-Text.Line-2"))
+                        .setLine3(config.getString("Wood-Sign-Scripts." + woodSignTitle + ".Sign-Text.Line-3"))
+                        .setLine4(config.getString("Wood-Sign-Scripts." + woodSignTitle + ".Sign-Text.Line-4"));
+                List<String> woodSignCommand = config.getStringList("Wood-Sign-Scripts." + woodSignTitle + ".Commands");
                 String permission = null;
-                if (!config.getBoolean("Wood-Sign-Scripts." + sections + ".Permission.Default")) {
-                    permission = config.getString("Wood-Sign-Scripts." + sections + ".Permission.Permission");
+                if (!config.getBoolean("Wood-Sign-Scripts." + woodSignTitle + ".Permission.Default")) {
+                    permission = config.getString("Wood-Sign-Scripts." + woodSignTitle + ".Permission.Permission");
                 }
                 scripts.add(new WoodSign(woodSignTitle, woodSignText, woodSignCommand, permission));
             } catch (Exception ex) {
                 Map<String, String> placeholders = MessageUtil.getDefaultPlaceholders();
-                placeholders.put("{signs}", sections);
+                placeholders.put("{signs}", woodSignTitle);
                 LiteSignInProperties.sendOperationMessage("WoodSignScriptLoadFailed", placeholders);
             }
         });
@@ -96,7 +95,7 @@ public class WoodSignUtil {
 
     public static WoodSign getWoodSign(String titleText) {
         for (WoodSign woodSign : scripts) {
-            if (woodSign.getWoodSignTitle().equalsIgnoreCase(titleText)) {
+            if (woodSign.woodSignTitle().equalsIgnoreCase(titleText)) {
                 return woodSign;
             }
         }
@@ -113,10 +112,7 @@ public class WoodSignUtil {
 
     public static void createWoodSignScript(Block block, WoodSign woodSign, boolean reloadFile) {
         int number = 1;
-        while (true) {
-            if (database.get("Database." + number) == null) {
-                break;
-            }
+        while (database.get("Database." + number) != null) {
             number++;
         }
         Location location = block.getLocation();
@@ -124,15 +120,15 @@ public class WoodSignUtil {
         database.set("Database." + number + ".Location.X", location.getBlockX());
         database.set("Database." + number + ".Location.Y", location.getBlockY());
         database.set("Database." + number + ".Location.Z", location.getBlockZ());
-        database.set("Database." + number + ".Script", woodSign.getWoodSignTitle());
+        database.set("Database." + number + ".Script", woodSign.woodSignTitle());
         saveScriptedSigns();
         if (reloadFile) loadSigns();
         PluginControl.runBukkitTask(() -> {
             Sign sign = (Sign) block.getState();
-            sign.setLine(0, ColorUtils.toColor(woodSign.getWoodSignText().getLine1()));
-            sign.setLine(1, ColorUtils.toColor(woodSign.getWoodSignText().getLine2()));
-            sign.setLine(2, ColorUtils.toColor(woodSign.getWoodSignText().getLine3()));
-            sign.setLine(3, ColorUtils.toColor(woodSign.getWoodSignText().getLine4()));
+            sign.setLine(0, ColorUtils.toColor(woodSign.woodSignText().getLine1()));
+            sign.setLine(1, ColorUtils.toColor(woodSign.woodSignText().getLine2()));
+            sign.setLine(2, ColorUtils.toColor(woodSign.woodSignText().getLine3()));
+            sign.setLine(3, ColorUtils.toColor(woodSign.woodSignText().getLine4()));
             sign.update();
         }, 1);
     }
@@ -169,7 +165,10 @@ public class WoodSignUtil {
 
     public static void scan() {
         int number = 0;
-        number = new ArrayList<>(scriptedSigns.keySet()).stream().filter(location -> location.getBlock() == null || !(location.getBlock().getState() instanceof Sign)).filter(location -> removeWoodSignScript(location)).map(m -> 1).reduce(number, Integer::sum);
+        number = new ArrayList<>(scriptedSigns.keySet()).stream().filter(location -> {
+            location.getBlock();
+            return !(location.getBlock().getState() instanceof Sign);
+        }).filter(WoodSignUtil::removeWoodSignScript).map(m -> 1).reduce(number, Integer::sum);
         if (number > 0) {
             Map<String, String> placeholders = MessageUtil.getDefaultPlaceholders();
             placeholders.put("{signs}", String.valueOf(number));
@@ -179,7 +178,7 @@ public class WoodSignUtil {
 
     public static void clickScript(Player player, WoodSign scriptedSign) {
         List<SignInRewardCommand> list = new ArrayList<>();
-        scriptedSign.getWoodSignCommand().stream().forEach(command -> {
+        scriptedSign.woodSignCommand().forEach(command -> {
             if (command.toLowerCase().startsWith("server:")) {
                 list.add(new SignInRewardCommand(SignInRewardCommandType.SERVER, command.substring(7)));
             } else if (command.toLowerCase().startsWith("op:")) {
@@ -188,7 +187,7 @@ public class WoodSignUtil {
                 list.add(new SignInRewardCommand(SignInRewardCommandType.PLAYER, command));
             }
         });
-        list.stream().forEach(command -> {
+        list.forEach(command -> {
             command.runWithThePlayer(player);
         });
     }

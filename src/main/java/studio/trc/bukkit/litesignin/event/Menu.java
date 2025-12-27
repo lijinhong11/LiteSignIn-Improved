@@ -33,9 +33,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class Menu
-        implements Listener {
-    public static final Map<UUID, SignInInventory> menuOpening = new HashMap();
+public class Menu implements Listener {
+    public static final Map<UUID, SignInInventory> menuOpening = new HashMap<>();
 
     public static void openGUI(Player player) {
         Runnable task = () -> {
@@ -88,8 +87,7 @@ public class Menu
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void click(InventoryClickEvent e) {
-        if (e.getWhoClicked() instanceof Player) {
-            Player player = (Player) e.getWhoClicked();
+        if (e.getWhoClicked() instanceof Player player) {
             if (menuOpening.get(player.getUniqueId()) != null) {
                 e.setCancelled(true);
                 YamlConfiguration guiConfig = ConfigurationUtil.getConfig(ConfigurationType.GUI_SETTINGS).getConfig();
@@ -177,10 +175,10 @@ public class Menu
                                 placeholders.put("{previousPageYear}", String.valueOf(previousPageYear));
                                 placeholders.put("{player}", player.getName());
                                 if (guiConfig.contains(MessageUtil.getLanguage() + ".SignIn-GUI-Settings.Key." + columns.getKeyType().getSectionName() + ".Commands")) {
-                                    guiConfig.getStringList(MessageUtil.getLanguage() + ".SignIn-GUI-Settings.Key." + columns.getKeyType().getSectionName() + ".Commands").stream().forEach(commands -> runCommand(player, commands, placeholders));
+                                    guiConfig.getStringList(MessageUtil.getLanguage() + ".SignIn-GUI-Settings.Key." + columns.getKeyType().getSectionName() + ".Commands").forEach(commands -> runCommand(player, commands, placeholders));
                                 }
                                 if (guiConfig.contains(MessageUtil.getLanguage() + ".SignIn-GUI-Settings.Key." + columns.getKeyType().getSectionName() + ".Messages")) {
-                                    guiConfig.getStringList(MessageUtil.getLanguage() + ".SignIn-GUI-Settings.Key." + columns.getKeyType().getSectionName() + ".Messages").stream().forEach(message -> MessageUtil.sendMessage(player, message, placeholders));
+                                    guiConfig.getStringList(MessageUtil.getLanguage() + ".SignIn-GUI-Settings.Key." + columns.getKeyType().getSectionName() + ".Messages").forEach(message -> MessageUtil.sendMessage(player, message, placeholders));
                                 }
                             } else {
                                 if (guiConfig.contains(MessageUtil.getLanguage() + ".SignIn-GUI-Settings.Others." + columns.getButtonName())) {
@@ -194,10 +192,10 @@ public class Menu
                                     placeholders.put("{previousPageYear}", String.valueOf(previousPageYear));
                                     placeholders.put("{player}", player.getName());
                                     if (guiConfig.contains(MessageUtil.getLanguage() + ".SignIn-GUI-Settings.Others." + columns.getButtonName() + ".Commands")) {
-                                        guiConfig.getStringList(MessageUtil.getLanguage() + ".SignIn-GUI-Settings.Others." + columns.getButtonName() + ".Commands").stream().forEach(commands -> runCommand(player, commands, placeholders));
+                                        guiConfig.getStringList(MessageUtil.getLanguage() + ".SignIn-GUI-Settings.Others." + columns.getButtonName() + ".Commands").forEach(commands -> runCommand(player, commands, placeholders));
                                     }
                                     if (guiConfig.contains(MessageUtil.getLanguage() + ".SignIn-GUI-Settings.Others." + columns.getButtonName() + ".Messages")) {
-                                        guiConfig.getStringList(MessageUtil.getLanguage() + ".SignIn-GUI-Settings.Others." + columns.getButtonName() + ".Messages").stream().forEach(message -> MessageUtil.sendMessage(player, message, placeholders));
+                                        guiConfig.getStringList(MessageUtil.getLanguage() + ".SignIn-GUI-Settings.Others." + columns.getButtonName() + ".Messages").forEach(message -> MessageUtil.sendMessage(player, message, placeholders));
                                     }
                                 }
                             }
@@ -211,8 +209,7 @@ public class Menu
 
     @EventHandler(ignoreCancelled = true)
     public void close(InventoryCloseEvent e) {
-        if (e.getPlayer() instanceof Player) {
-            Player player = (Player) e.getPlayer();
+        if (e.getPlayer() instanceof Player player) {
             if (menuOpening.get(player.getUniqueId()) != null) {
                 menuOpening.remove(player.getUniqueId());
                 PluginControl.runBukkitTask(() -> {

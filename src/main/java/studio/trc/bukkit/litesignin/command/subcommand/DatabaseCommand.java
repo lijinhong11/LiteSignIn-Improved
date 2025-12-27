@@ -85,7 +85,7 @@ public class DatabaseCommand
                 return;
             }
             JSONComponent jsonComponent = new JSONComponent(MessageUtil.replacePlaceholders(sender, MessageUtil.getMessage("Command-Messages.Database.Confirm.Button.Text"), new HashMap()), MessageUtil.getMessageList("Command-Messages.Database.Confirm.Button.Hover"), "RUN_COMMAND", "/litesignin:signin database confirm");
-            MessageUtil.getMessageList("Command-Messages.Database.Confirm.Need-Confirm").stream().forEach(message -> MessageUtil.sendMessageWithJSONComponent(sender, message, placeholders, "%button%", jsonComponent));
+            MessageUtil.getMessageList("Command-Messages.Database.Confirm.Need-Confirm").forEach(message -> MessageUtil.sendMessageWithJSONComponent(sender, message, placeholders, "%button%", jsonComponent));
             confirmCache.put(sender, Confirm.BACKUP);
         }
     }
@@ -106,7 +106,7 @@ public class DatabaseCommand
             return;
         }
         JSONComponent jsonComponent = new JSONComponent(MessageUtil.replacePlaceholders(sender, MessageUtil.getMessage("Command-Messages.Database.Confirm.Button.Text"), new HashMap()), MessageUtil.getMessageList("Command-Messages.Database.Confirm.Button.Hover"), "RUN_COMMAND", "/litesignin:signin database confirm");
-        MessageUtil.getMessageList("Command-Messages.Database.Confirm.Need-Confirm").stream().forEach(message -> MessageUtil.sendMessageWithJSONComponent(sender, message, placeholders, "%button%", jsonComponent));
+        MessageUtil.getMessageList("Command-Messages.Database.Confirm.Need-Confirm").forEach(message -> MessageUtil.sendMessageWithJSONComponent(sender, message, placeholders, "%button%", jsonComponent));
         Confirm confirm = Confirm.ROLLBACK;
         confirm.setTargetFile(file);
         confirmCache.put(sender, confirm);

@@ -1,20 +1,10 @@
 package studio.trc.bukkit.litesignin.nms;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.HoverEventSource;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.ItemTag;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Item;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import studio.trc.bukkit.litesignin.util.AdventureUtils;
-
-import java.lang.reflect.Method;
-import java.util.Arrays;
 
 public class NMSManager {
     public static Class<?> craftItemStack;
@@ -28,7 +18,6 @@ public class NMSManager {
     }
 
     public static void reloadNMS() {
-
         //craftbukkit
         try {
             craftItemStack = Class.forName("org.bukkit.craftbukkit." + getPackageName() + ".inventory.CraftItemStack");
@@ -65,44 +54,11 @@ public class NMSManager {
         }
     }
 
-    public static void setItemHover(ItemStack item, BaseComponent component) {
-        try {
-            Item hoverItem = new Item(
-                    item.getType().getKey().toString(),
-                    item.getAmount(),
-                    ItemTag.ofNbt(item.getItemMeta() != null ? (String) ItemMeta.class.getMethod("getAsString").invoke(item.getItemMeta()) : "")
-            );
-            component.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_ITEM, hoverItem));
-        } catch (Throwable t) {
-            try {
-                if (nbtTagCompound == null) return;
-                Object mcStack = craftItemStack.getDeclaredMethod("asNMSCopy", ItemStack.class).invoke(null, item);
-                Object NBTTagCompound = nbtTagCompound.newInstance();
-                Method saveMethod = Arrays.stream(itemStack.getDeclaredMethods()).filter(method -> method.getParameterTypes().length == 1 && method.getParameterTypes()[0].equals(nbtTagCompound) && method.getReturnType().equals(nbtTagCompound)).findFirst().orElse(null);
-                if (saveMethod != null) {
-                    if (saveMethod.isAccessible()) {
-                        saveMethod.invoke(mcStack, NBTTagCompound);
-                    } else {
-                        saveMethod.setAccessible(true);
-                        saveMethod.invoke(mcStack, NBTTagCompound);
-                        saveMethod.setAccessible(false);
-                    }
-                } else {
-                    nbtTagCompound.getMethod("putString", String.class, String.class).invoke(NBTTagCompound, "id", item.getType().getKey().toString());
-                    nbtTagCompound.getMethod("putByte", String.class, byte.class).invoke(NBTTagCompound, "Count", (byte) item.getAmount());
-                }
-                component.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_ITEM, new ComponentBuilder(NBTTagCompound.toString()).create()));
-            } catch (Throwable t1) {
-                t1.printStackTrace();
-            }
-        }
+    public static Component setItemHover(ItemStack item, Object component) {
+        return AdventureUtils.toComponent(component).hoverEvent(item);
     }
 
-    public static Object setItemHover(ItemStack item, Object component) {
-        return AdventureUtils.toComponent(component).hoverEvent((HoverEventSource) item);
-    }
-
-    public static Object getAdventureJSONItemStack(ItemStack item) {
+    public static Component getAdventureJSONItemStack(ItemStack item) {
         if (item != null && !item.getType().equals(Material.AIR)) {
             try {
                 String translationKey = Material.class.getMethod("translationKey").invoke(item.getType()).toString();
@@ -112,15 +68,6 @@ public class NMSManager {
             }
         }
         return Component.text("");
-    }
-
-    public static TextComponent getBungeeJSONItemStack(ItemStack item) {
-        if (item != null && !item.getType().equals(Material.AIR)) {
-            TextComponent component = new TextComponent(toDisplayName(item.getType().name()));
-            setItemHover(item, component);
-            return component;
-        }
-        return new TextComponent();
     }
 
     private static String toDisplayName(String text) {

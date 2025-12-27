@@ -13,8 +13,7 @@ import studio.trc.bukkit.litesignin.database.storage.SQLiteStorage;
 import studio.trc.bukkit.litesignin.util.OnlineTimeRecord;
 import studio.trc.bukkit.litesignin.util.PluginControl;
 
-public class Quit
-        implements Listener {
+public class Quit implements Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
     public void quit(PlayerQuitEvent e) {
         Player player = e.getPlayer();

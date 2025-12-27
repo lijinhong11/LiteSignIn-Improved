@@ -62,7 +62,7 @@ public class Updater {
                     placeholders.put("{description}", description_);
                     MessageUtil.sendMessage(Bukkit.getConsoleSender(), ConfigurationUtil.getConfig(ConfigurationType.MESSAGES), "Updater.Checked", placeholders);
                     if (!extra.isEmpty()) {
-                        extra.stream().forEach(message -> MessageUtil.sendMessage(Bukkit.getConsoleSender(), message));
+                        extra.forEach(message -> MessageUtil.sendMessage(Bukkit.getConsoleSender(), message));
                     }
                 }
             } catch (InvalidConfigurationException | IOException ex) {

@@ -160,9 +160,6 @@ public final class YamlStorage
                         if (name == null) {
                             name = "null";
                         }
-                        if (history == null) {
-                            history = "";
-                        }
                         try (PreparedStatement statement = sqlConnection.prepareStatement("INSERT INTO PlayerData(UUID, Name, Year, Month, Day, Hour, Minute, Second, Continuous, RetroactiveCard, History)"
                                 + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
                             statement.setString(1, uuid);
@@ -190,21 +187,21 @@ public final class YamlStorage
         int year = getYear();
         int month = getMonth();
         int day = getDay();
-        if (Integer.valueOf(date[0]) == year && Integer.valueOf(date[1]) == month && Integer.valueOf(date[2]) == day)
+        if (Integer.parseInt(date[0]) == year && Integer.parseInt(date[1]) == month && Integer.parseInt(date[2]) == day)
             return;
         boolean breakSign = true;
-        if (year == Integer.valueOf(date[0])) {
+        if (year == Integer.parseInt(date[0])) {
             int[] days = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
             if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
                 days[1] = 29;
             }
-            if (days[month - 1] == day && month + 1 == Integer.valueOf(date[1])) {
+            if (days[month - 1] == day && month + 1 == Integer.parseInt(date[1])) {
                 breakSign = false;
-            } else if (day + 1 == Integer.valueOf(date[2])) {
+            } else if (day + 1 == Integer.parseInt(date[2])) {
                 breakSign = false;
             }
-        } else if (year + 1 == Integer.valueOf(date[0])) {
-            if (month == 12 && Integer.valueOf(date[1]) == 1 && day == 31 && Integer.valueOf(date[2]) == 1) {
+        } else if (year + 1 == Integer.parseInt(date[0])) {
+            if (month == 12 && Integer.parseInt(date[1]) == 1 && day == 31 && Integer.parseInt(date[2]) == 1) {
                 breakSign = false;
             }
         }
@@ -218,7 +215,7 @@ public final class YamlStorage
         Player player = Bukkit.getPlayer(uuid);
         if (player == null) return;
         if (ConfigurationUtil.getConfig(ConfigurationType.CONFIG).getBoolean("Enable-Multi-Group-Reward")) {
-            getAllGroup().stream().forEach(group -> {
+            getAllGroup().forEach(group -> {
                 int queue = SignInQueue.getInstance().getRank(uuid);
                 int continuousSignIn = getContinuousSignIn();
                 int totalNumber = getCumulativeNumber();
@@ -412,7 +409,7 @@ public final class YamlStorage
     public List<SignInDate> getHistory() {
         List<SignInDate> history = new ArrayList<>();
         if (config.get("History") != null) {
-            config.getStringList("History").stream().forEach(data -> {
+            config.getStringList("History").forEach(data -> {
                 history.add(SignInDate.getInstance(data));
             });
         }
@@ -446,7 +443,7 @@ public final class YamlStorage
     @Override
     public void setHistory(List<SignInDate> history, boolean saveData) {
         List<String> data = new ArrayList<>();
-        history.stream().forEach(dates -> {
+        history.forEach(dates -> {
             data.add(dates.getDataText(dates.hasTimePeriod()));
         });
         config.set("History", data);

@@ -18,32 +18,6 @@ public class LiteSignInProperties {
      */
     public static Properties propertiesFile = new Properties();
 
-    public static void reloadProperties() {
-        try {
-            propertiesFile.load(Main.class.getResourceAsStream("/Languages/" + MessageUtil.Language.getLocaleLanguage().getFolderName() + ".properties"));
-            sendOperationMessage("LanguageLoaded");
-            List<String> authors = new ArrayList<>();
-            switch (MessageUtil.Language.getLocaleLanguage()) {
-                case SIMPLIFIED_CHINESE: {
-                    authors.add("红色创意工作室 (TRC Studio)");
-                    break;
-                }
-                case TRADITIONAL_CHINESE: {
-                    authors.add("紅色創意工作室 (TRC Studio)");
-                    break;
-                }
-                default: {
-                    authors.add("The Red Creative Studio (TRC Studio)");
-                    break;
-                }
-            }
-            Field field = Main.getInstance().getDescription().getClass().getDeclaredField("authors");
-            field.setAccessible(true);
-            field.set(Main.getInstance().getDescription(), authors);
-        } catch (Exception ignored) {
-        }
-    }
-
     public static void sendOperationMessage(String path) {
         CommandSender sender = Bukkit.getConsoleSender();
         if (propertiesFile.containsKey(path)) {

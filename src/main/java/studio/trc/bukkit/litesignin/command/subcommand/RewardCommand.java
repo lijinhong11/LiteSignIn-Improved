@@ -367,9 +367,9 @@ public class RewardCommand
                     return new ArrayList<>();
                 }
                 List<String> values = new ArrayList<>();
-                config.getConfigurationSection("Reward-Settings.Permission-Groups." + args[2] + ".Special-Times-Of-Month").getKeys(false).stream().forEach(value -> {
+                config.getConfigurationSection("Reward-Settings.Permission-Groups." + args[2] + ".Special-Times-Of-Month").getKeys(false).forEach(value -> {
                     if (config.get("Reward-Settings.Permission-Groups." + args[2] + ".Special-Times-Of-Month." + value + ".Valid-Months") != null) {
-                        config.getIntegerList("Reward-Settings.Permission-Groups." + args[2] + ".Special-Times-Of-Month." + value + ".Valid-Months").stream().forEach(month -> {
+                        config.getIntegerList("Reward-Settings.Permission-Groups." + args[2] + ".Special-Times-Of-Month." + value + ".Valid-Months").forEach(month -> {
                             values.add(RewardType.SPECIAL_TIMES_OF_MONTH.name() + ":" + value + ":" + month);
                         });
                     } else {
@@ -382,9 +382,9 @@ public class RewardCommand
                     return new ArrayList<>();
                 }
                 List<String> values = new ArrayList<>();
-                config.getConfigurationSection("Reward-Settings.Permission-Groups." + args[2] + ".Statistics-Times-Of-Month").getKeys(false).stream().forEach(value -> {
+                config.getConfigurationSection("Reward-Settings.Permission-Groups." + args[2] + ".Statistics-Times-Of-Month").getKeys(false).forEach(value -> {
                     if (config.get("Reward-Settings.Permission-Groups." + args[2] + ".Statistics-Times-Of-Month." + value + ".Valid-Months") != null) {
-                        config.getIntegerList("Reward-Settings.Permission-Groups." + args[2] + ".Statistics-Times-Of-Month." + value + ".Valid-Months").stream().forEach(month -> {
+                        config.getIntegerList("Reward-Settings.Permission-Groups." + args[2] + ".Statistics-Times-Of-Month." + value + ".Valid-Months").forEach(month -> {
                             values.add(RewardType.STATISTICS_OF_MONTH.name() + ":" + value + ":" + month);
                         });
                     } else {

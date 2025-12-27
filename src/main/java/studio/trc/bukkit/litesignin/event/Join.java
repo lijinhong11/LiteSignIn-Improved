@@ -19,8 +19,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class Join
-        implements Listener {
+public class Join implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onJoin(PlayerJoinEvent event) {
         if (BackupUtil.isBackingUp() || RollBackUtil.isRollingback()) {
@@ -43,7 +42,7 @@ public class Join
                     } else if (OnlineTimeRecord.getSignInRequirement(player) == -1) {
                         LiteSignInThread.runTask(() -> SkullManager.refreshTextureByDefaultMethod(player.getUniqueId(), player.getName()));
                         SignInDate date = SignInDate.getInstance(new Date());
-                        MessageUtil.getMessageList("Join-Event.Messages").stream().forEach(text -> {
+                        MessageUtil.getMessageList("Join-Event.Messages").forEach(text -> {
                             if (text.toLowerCase().contains("%opengui%")) {
                                 Map<String, String> placeholders = MessageUtil.getDefaultPlaceholders();
                                 placeholders.put("{date}", date.getName(ConfigurationUtil.getConfig(ConfigurationType.GUI_SETTINGS).getString(MessageUtil.getLanguage() + ".SignIn-GUI-Settings.Date-Format")));
@@ -73,7 +72,7 @@ public class Join
         if (Updater.isFoundANewVersion() && PluginControl.enableUpdater()) {
             if (LiteSignInUtils.hasPermission(player, "Updater")) {
                 String nowVersion = Main.getInstance().getDescription().getVersion();
-                MessageUtil.getMessageList("Updater.Checked").stream().forEach(text -> {
+                MessageUtil.getMessageList("Updater.Checked").forEach(text -> {
                     if (text.toLowerCase().contains("%link%")) {
                         JSONComponent jsonComponent = new JSONComponent(MessageUtil.getMessage("Updater.Link.Message"), MessageUtil.getMessageList("Updater.Link.Hover-Text"), "OPEN_URL", Updater.getLink());
                         Map<String, String> placeholders = MessageUtil.getDefaultPlaceholders();

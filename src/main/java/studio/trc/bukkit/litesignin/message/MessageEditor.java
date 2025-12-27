@@ -1,8 +1,6 @@
 package studio.trc.bukkit.litesignin.message;
 
 import net.kyori.adventure.text.Component;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
 import studio.trc.bukkit.litesignin.util.AdventureUtils;
 
@@ -12,20 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 public class MessageEditor {
-    public static List<BaseComponent> createBungeeJSONMessage(CommandSender sender, String message, Map<String, BaseComponent> baseComponents) {
-        List<MessageSection> sections = parse(message, baseComponents);
-        List<BaseComponent> components = new ArrayList<>();
-        sections.stream().forEach(section -> {
-            if (section.isPlaceholder()) {
-                components.add(section.getBungeeComponent());
-            } else {
-                components.add(new TextComponent(MessageUtil.toPlaceholderAPIResult(sender, section.getText()).replace("/n", "\n")));
-            }
-        });
-        return components;
-    }
-
-    public static Object createAdventureJSONMessage(CommandSender sender, String message, Map<String, Component> components) {
+    public static Component createAdventureJSONMessage(CommandSender sender, String message, Map<String, Component> components) {
         List<MessageSection> sections = parse(message, components);
         Component component = null;
         for (MessageSection section : sections) {
@@ -36,13 +21,13 @@ public class MessageEditor {
                 component = component == null ? AdventureUtils.serializeText(text) : component.append(AdventureUtils.serializeText(text));
             }
         }
-        return component != null ? component : Component.text("");
+        return component != null ? component : Component.empty();
     }
 
     public static <T> List<MessageSection> parse(String message, Map<String, T> placeholders) {
         //Convert all placeholders to lowercase (in order to ignore case matching in the following code)
         Map<String, T> normalizedMap = new HashMap<>();
-        placeholders.entrySet().stream().forEach(entry -> normalizedMap.put(entry.getKey().toLowerCase(), entry.getValue()));
+        placeholders.forEach((key, value) -> normalizedMap.put(key.toLowerCase(), value));
 
         //Sort placeholders in descending order by length (avoid short placeholders matching the prefix of long placeholders)
         List<String> sortedKeys = new ArrayList<>(normalizedMap.keySet());
@@ -64,7 +49,7 @@ public class MessageEditor {
                 String paragraph = message.substring(index, endIndex);
                 if (paragraph.toLowerCase().equals(keyLower)) {
                     //When the match is successful, add the accumulated text to the result first
-                    if (currentText.length() > 0) {
+                    if (!currentText.isEmpty()) {
                         result.add(new MessageSection(
                                 currentText.toString(),
                                 null,
@@ -74,23 +59,16 @@ public class MessageEditor {
                         currentText.setLength(0);
                     }
                     T replacement = normalizedMap.get(keyLower);
-                    if (replacement instanceof BaseComponent) {
-                        result.add(new MessageSection(
-                                (BaseComponent) replacement,
-                                paragraph,
-                                index,
-                                index + keyLength
-                        ));
-                    } else if (replacement instanceof String) {
+                    if (replacement instanceof String) {
                         result.add(new MessageSection(
                                 replacement.toString(),
                                 paragraph,
                                 index,
                                 index + keyLength
                         ));
-                    } else if (replacement instanceof Component) {
+                    } else if (replacement instanceof Component component) {
                         result.add(new MessageSection(
-                                replacement,
+                                component,
                                 paragraph,
                                 index,
                                 index + keyLength
@@ -105,7 +83,7 @@ public class MessageEditor {
             }
             //If no placeholder is found, proceed to the next character
             if (!matched) {
-                if (currentText.length() == 0) {
+                if (currentText.isEmpty()) {
                     textStart = index;
                 }
                 currentText.append(message.charAt(index));
@@ -114,7 +92,7 @@ public class MessageEditor {
         }
 
         //Process the remaining text
-        if (currentText.length() > 0) {
+        if (!currentText.isEmpty()) {
             result.add(new MessageSection(
                     currentText.toString(),
                     null,

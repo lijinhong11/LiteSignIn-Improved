@@ -1,25 +1,31 @@
 package studio.trc.bukkit.litesignin.event.custom;
 
+import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 import studio.trc.bukkit.litesignin.gui.SignInInventory;
 import studio.trc.bukkit.litesignin.util.SignInDate;
 
 import java.util.Date;
 
-public class SignInGUIOpenEvent
-        extends Event
-        implements Cancellable {
+public class SignInGUIOpenEvent extends Event implements Cancellable {
     public static HandlerList handlers = new HandlerList();
 
+    @Getter
     private final SignInDate time = SignInDate.getInstance(new Date());
+    @Getter
     private final Player player;
+    @Getter
     private final SignInInventory inventory;
-    private boolean cancelled = false;
+    @Getter
     private int month = time.getMonth();
+    @Getter
     private int year = time.getYear();
+
+    private boolean cancelled = false;
 
     public SignInGUIOpenEvent(Player player, SignInInventory inventory) {
         this.player = player;
@@ -43,28 +49,8 @@ public class SignInGUIOpenEvent
         return handlers;
     }
 
-    public Player getPlayer() {
-        return player;
-    }
-
-    public SignInInventory getInventory() {
-        return inventory;
-    }
-
-    public SignInDate getTime() {
-        return time;
-    }
-
-    public int getMonth() {
-        return month;
-    }
-
-    public int getYear() {
-        return year;
-    }
-
     @Override
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return handlers;
     }
 

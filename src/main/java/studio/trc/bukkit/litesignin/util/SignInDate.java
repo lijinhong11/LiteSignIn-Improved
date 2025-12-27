@@ -9,8 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class SignInDate
-        implements Serializable {
+public class SignInDate implements Serializable {
     @Getter
     @Setter
     private int year;
@@ -35,12 +34,12 @@ public class SignInDate
     public SignInDate(Date d) throws Exception {
         String[] date = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(d).split("-");
 
-        year = Integer.valueOf(date[0]);
+        year = Integer.parseInt(date[0]);
         if (year < 1970 || year > Calendar.getInstance().get(Calendar.YEAR)) {
             throw new Exception();
         }
 
-        month = Integer.valueOf(date[1]);
+        month = Integer.parseInt(date[1]);
         if (month < 1 || month > 12) {
             throw new Exception();
         }
@@ -49,21 +48,18 @@ public class SignInDate
         if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
             days[1] = 29;
         }
-        if (Integer.valueOf(date[2]) > days[month - 1]) {
-            day = days[month - 1];
-        } else {
-            day = Integer.valueOf(date[2]);
-        }
 
-        hour = Integer.valueOf(date[3]);
-        minute = Integer.valueOf(date[4]);
-        second = Integer.valueOf(date[5]);
+        day = Math.min(Integer.parseInt(date[2]), days[month - 1]);
+
+        hour = Integer.parseInt(date[3]);
+        minute = Integer.parseInt(date[4]);
+        second = Integer.parseInt(date[5]);
         timePeriodFound = true;
     }
 
     public SignInDate(String[] date) throws Exception {
-        year = Integer.valueOf(date[0]);
-        month = Integer.valueOf(date[1]);
+        year = Integer.parseInt(date[0]);
+        month = Integer.parseInt(date[1]);
 
         if (year < 1970 || year > Calendar.getInstance().get(Calendar.YEAR)) {
             throw new Exception();
@@ -77,16 +73,13 @@ public class SignInDate
         if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
             days[1] = 29;
         }
-        if (Integer.valueOf(date[2]) > days[month - 1]) {
-            day = days[month - 1];
-        } else {
-            day = Integer.valueOf(date[2]);
-        }
+
+        day = Math.min(Integer.parseInt(date[2]), days[month - 1]);
 
         if (date.length > 3) {
-            hour = Integer.valueOf(date[3]);
-            minute = Integer.valueOf(date[4]);
-            second = Integer.valueOf(date[5]);
+            hour = Integer.parseInt(date[3]);
+            minute = Integer.parseInt(date[4]);
+            second = Integer.parseInt(date[5]);
             timePeriodFound = true;
         } else {
             hour = 0;
@@ -148,8 +141,8 @@ public class SignInDate
 
     public SignInDate(String datatext) throws Exception {
         String[] date = datatext.split("-");
-        year = Integer.valueOf(date[0]);
-        month = Integer.valueOf(date[1]);
+        year = Integer.parseInt(date[0]);
+        month = Integer.parseInt(date[1]);
 
         if (year < 1970 || year > Calendar.getInstance().get(Calendar.YEAR)) {
             throw new Exception();
@@ -163,16 +156,13 @@ public class SignInDate
         if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
             days[1] = 29;
         }
-        if (Integer.valueOf(date[2]) > days[month - 1]) {
-            day = days[month - 1];
-        } else {
-            day = Integer.valueOf(date[2]);
-        }
+
+        day = Math.min(Integer.parseInt(date[2]), days[month - 1]);
 
         if (date.length > 3) {
-            hour = Integer.valueOf(date[3]);
-            minute = Integer.valueOf(date[4]);
-            second = Integer.valueOf(date[5]);
+            hour = Integer.parseInt(date[3]);
+            minute = Integer.parseInt(date[4]);
+            second = Integer.parseInt(date[5]);
             timePeriodFound = true;
         } else {
             hour = 0;
@@ -185,20 +175,20 @@ public class SignInDate
         String[] split = timePeriod.split(":");
         try {
             SignInDate today = SignInDate.getInstance(new Date());
-            int hour = Integer.valueOf(split[0]);
+            int hour = Integer.parseInt(split[0]);
             if (hour > 23 || hour < 0) {
                 return null;
             }
             int minute = 0;
             if (split.length >= 2) {
-                minute = Integer.valueOf(split[1]);
+                minute = Integer.parseInt(split[1]);
             }
             if (minute > 59 || minute < 0) {
                 return null;
             }
             int second = 0;
             if (split.length >= 3) {
-                second = Integer.valueOf(split[2]);
+                second = Integer.parseInt(split[2]);
             }
             if (second > 59 || second < 0) {
                 return null;
@@ -372,7 +362,7 @@ public class SignInDate
     public int compareTo(SignInDate date) {
         long thisTime = getMillisecond();
         long anotherTime = date.getMillisecond();
-        return thisTime < anotherTime ? -1 : (thisTime == anotherTime ? 0 : 1);
+        return Long.compare(thisTime, anotherTime);
     }
 
     public long getMillisecond() {
@@ -407,8 +397,7 @@ public class SignInDate
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof SignInDate) {
-            SignInDate date = (SignInDate) obj;
+        if (obj instanceof SignInDate date) {
             return date.getYear() == year && date.getMonth() == month && date.getDay() == day;
         }
         return false;

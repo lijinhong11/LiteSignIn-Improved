@@ -1,6 +1,5 @@
 package studio.trc.bukkit.litesignin.util;
 
-import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
@@ -9,17 +8,7 @@ import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomItem {
-    @Getter
-    private final ItemStack itemStack;
-    @Getter
-    private final String name;
-
-    public CustomItem(ItemStack itemStack, String name) {
-        this.itemStack = itemStack;
-        this.name = name;
-    }
-
+public record CustomItem(ItemStack itemStack, String name) {
     public static List<CustomItem> getItemStackCollection() {
         List<CustomItem> itemList = new ArrayList<>();
         for (String name : ConfigurationUtil.getConfig(ConfigurationType.CUSTOM_ITEMS).getConfigurationSection("Item-Collection").getKeys(false)) {
@@ -41,7 +30,7 @@ public class CustomItem {
 
     public static boolean addItemAsCollection(ItemStack is, String name) {
         for (CustomItem ci : getItemStackCollection()) {
-            if (ci.getName().equals(name)) {
+            if (ci.name().equals(name)) {
                 return false;
             }
         }
@@ -52,7 +41,7 @@ public class CustomItem {
 
     public static boolean deleteItemAsCollection(String name) {
         for (CustomItem ci : getItemStackCollection()) {
-            if (ci.getName().equals(name)) {
+            if (ci.name().equals(name)) {
                 ci.delete();
                 return true;
             }

@@ -36,7 +36,6 @@ public class PluginControl {
     public static void reload() {
         ConfigurationUtil.reloadConfig();
         MessageUtil.loadPlaceholders();
-        MessageUtil.setAdventureAvailable();
         YamlStorage.cache.clear();
         SQLiteStorage.cache.clear();
         MySQLStorage.cache.clear();
@@ -75,7 +74,7 @@ public class PluginControl {
     public static void reloadMySQL() {
         RobustConfiguration config = ConfigurationUtil.getConfig(ConfigurationType.CONFIG);
         Map<String, String> jdbcOptions = new HashMap();
-        config.getConfigurationSection("MySQL-Storage.Options").getKeys(false).stream().forEach(option -> {
+        config.getConfigurationSection("MySQL-Storage.Options").getKeys(false).forEach(option -> {
             jdbcOptions.put(option, config.getString("MySQL-Storage.Options." + option));
         });
         if (MySQLEngine.getInstance() != null) {
@@ -101,9 +100,9 @@ public class PluginControl {
     }
 
     public static void savePlayerData() {
-        YamlStorage.cache.values().stream().forEach(YamlStorage::saveData);
-        MySQLStorage.cache.values().stream().forEach(MySQLStorage::saveData);
-        SQLiteStorage.cache.values().stream().forEach(SQLiteStorage::saveData);
+        YamlStorage.cache.values().forEach(YamlStorage::saveData);
+        MySQLStorage.cache.values().forEach(MySQLStorage::saveData);
+        SQLiteStorage.cache.values().forEach(SQLiteStorage::saveData);
     }
 
     public static void hideEnchants(ItemMeta im) {
@@ -247,7 +246,7 @@ public class PluginControl {
             ItemMeta im = is.getItemMeta();
             if (ConfigurationUtil.getConfig(ConfigurationType.CUSTOM_ITEMS).get("Manual-Settings." + itemName + ".Lore") != null) {
                 List<String> lore = new ArrayList<>();
-                ConfigurationUtil.getConfig(ConfigurationType.CUSTOM_ITEMS).getStringList("Manual-Settings." + itemName + ".Lore").stream().forEach(lores -> lore.add(MessageUtil.toPlaceholderAPIResult(player, ColorUtils.toColor(lores))));
+                ConfigurationUtil.getConfig(ConfigurationType.CUSTOM_ITEMS).getStringList("Manual-Settings." + itemName + ".Lore").forEach(lores -> lore.add(MessageUtil.toPlaceholderAPIResult(player, ColorUtils.toColor(lores))));
                 im.setLore(lore);
             }
             if (ConfigurationUtil.getConfig(ConfigurationType.CUSTOM_ITEMS).get("Manual-Settings." + itemName + ".Enchantment") != null) {

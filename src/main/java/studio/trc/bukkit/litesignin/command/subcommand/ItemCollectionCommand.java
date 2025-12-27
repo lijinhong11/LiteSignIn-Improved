@@ -1,17 +1,13 @@
 package studio.trc.bukkit.litesignin.command.subcommand;
 
 import lombok.Getter;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import studio.trc.bukkit.litesignin.command.SignInSubCommand;
 import studio.trc.bukkit.litesignin.command.SignInSubCommandType;
 import studio.trc.bukkit.litesignin.message.MessageUtil;
-import studio.trc.bukkit.litesignin.nms.NMSManager;
 import studio.trc.bukkit.litesignin.util.AdventureUtils;
 import studio.trc.bukkit.litesignin.util.CustomItem;
 import studio.trc.bukkit.litesignin.util.LiteSignInUtils;
@@ -20,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class ItemCollectionCommand
         implements SignInSubCommand {
@@ -57,12 +52,10 @@ public class ItemCollectionCommand
         if (args.length <= 2) {
             List<String> commands = Arrays.stream(SubCommandType.values())
                     .filter(type -> LiteSignInUtils.hasCommandPermission(sender, type.getCommandPermissionPath(), false))
-                    .map(type -> type.getCommandName())
-                    .collect(Collectors.toList());
+                    .map(SubCommandType::getCommandName)
+                    .toList();
             List<String> names = new ArrayList<>();
-            commands.stream().filter(command -> command.toLowerCase().startsWith(subCommandType.toLowerCase())).forEach(command -> {
-                names.add(command);
-            });
+            commands.stream().filter(command -> command.toLowerCase().startsWith(subCommandType.toLowerCase())).forEach(names::add);
             return names;
         } else {
             if (subCommandType.equalsIgnoreCase("delete") && LiteSignInUtils.hasCommandPermission(sender, SubCommandType.DELETE.commandPermissionPath, false)) {
@@ -90,28 +83,9 @@ public class ItemCollectionCommand
             MessageUtil.sendCommandMessage(sender, "ItemCollection.List.Empty");
         } else {
             placeholders.put("{amount}", String.valueOf(itemList.size()));
-            MessageUtil.getMessageList("Command-Messages.ItemCollection.List.Messages").stream().forEach(text -> {
+            MessageUtil.getMessageList("Command-Messages.ItemCollection.List.Messages").forEach(text -> {
                 if (text.toLowerCase().contains("%list%")) {
-                    if (MessageUtil.useAdventure()) {
-                        MessageUtil.sendAdventureMessage(sender, text, placeholders, AdventureUtils.getItemDisplay(itemList));
-                    } else {
-                        String[] splitMessage = text.split("%list%");
-                        List<BaseComponent> message = new ArrayList<>();
-                        List<BaseComponent> components = new ArrayList<>();
-                        for (int i = 0; i < itemList.size(); i++) {
-                            components.add(NMSManager.getBungeeJSONItemStack(itemList.get(i).getItemStack()));
-                            if (i != itemList.size() - 1) {
-                                components.add(new TextComponent(", "));
-                            }
-                        }
-                        for (int i = 0; i < splitMessage.length; i++) {
-                            message.add(new TextComponent(MessageUtil.replacePlaceholders(sender, splitMessage[i], placeholders)));
-                            if (i < splitMessage.length - 1 || text.endsWith("%list%")) {
-                                message.addAll(components);
-                            }
-                        }
-                        MessageUtil.sendBungeeJSONMessage(sender, message);
-                    }
+                    MessageUtil.sendAdventureMessage(sender, text, placeholders, AdventureUtils.getItemDisplay(itemList));
                 } else {
                     MessageUtil.sendMessage(sender, text, placeholders);
                 }
@@ -131,8 +105,8 @@ public class ItemCollectionCommand
         } else if (args.length >= 3) {
             Map<String, String> placeholders = MessageUtil.getDefaultPlaceholders();
             Player player = (Player) sender;
-            ItemStack is = player.getItemInHand();
-            if (is == null && is.getType().equals(Material.AIR)) {
+            ItemStack is = player.getInventory().getItemInMainHand();
+            if (is.getType().isAir()) {
                 MessageUtil.sendCommandMessage(sender, "ItemCollection.Add.Doesnt-Have-Item-In-Hand");
             } else if (CustomItem.addItemAsCollection(is, args[2])) {
                 placeholders.put("{name}", args[2]);
@@ -155,7 +129,7 @@ public class ItemCollectionCommand
             CustomItem item = CustomItem.getCustomItem(args[2]);
             if (item != null) {
                 item.delete();
-                MessageUtil.sendMessageWithItem(sender, MessageUtil.getMessage("Command-Messages.ItemCollection.Delete.Successfully"), placeholders, item.getItemStack());
+                MessageUtil.sendMessageWithItem(sender, MessageUtil.getMessage("Command-Messages.ItemCollection.Delete.Successfully"), placeholders, item.itemStack());
             } else {
                 placeholders.put("{name}", args[2]);
                 MessageUtil.sendCommandMessage(sender, "ItemCollection.Delete.Not-Exist", placeholders);
@@ -180,7 +154,7 @@ public class ItemCollectionCommand
                 MessageUtil.sendCommandMessage(sender, "ItemCollection.Give.Not-Exist", placeholders);
             } else {
                 item.give((Player) sender);
-                MessageUtil.sendMessageWithItem(sender, MessageUtil.getMessage("Command-Messages.ItemCollection.Give.Give-Yourself"), placeholders, item.getItemStack());
+                MessageUtil.sendMessageWithItem(sender, MessageUtil.getMessage("Command-Messages.ItemCollection.Give.Give-Yourself"), placeholders, item.itemStack());
             }
         } else if (args.length >= 4) {
             Player player = Bukkit.getPlayer(args[3]);
@@ -195,7 +169,7 @@ public class ItemCollectionCommand
                 MessageUtil.sendCommandMessage(sender, "ItemCollection.Give.Not-Exist", placeholders);
             } else {
                 item.give(player);
-                MessageUtil.sendMessageWithItem(sender, MessageUtil.getMessage("Command-Messages.ItemCollection.Give.Give-Others"), placeholders, item.getItemStack());
+                MessageUtil.sendMessageWithItem(sender, MessageUtil.getMessage("Command-Messages.ItemCollection.Give.Give-Others"), placeholders, item.itemStack());
             }
         }
     }
@@ -203,8 +177,8 @@ public class ItemCollectionCommand
     private List<String> tab_delete(String[] args) {
         List<String> list = new ArrayList<>();
         if (args.length == 3) {
-            CustomItem.getItemStackCollection().stream().filter(customItem -> customItem.getName().toLowerCase().startsWith(args[2].toLowerCase())).forEach(customItem -> {
-                list.add(customItem.getName());
+            CustomItem.getItemStackCollection().stream().filter(customItem -> customItem.name().toLowerCase().startsWith(args[2].toLowerCase())).forEach(customItem -> {
+                list.add(customItem.name());
             });
         }
         return list;
@@ -213,8 +187,8 @@ public class ItemCollectionCommand
     private List<String> tab_give(String[] args) {
         List<String> list = new ArrayList<>();
         if (args.length == 3) {
-            CustomItem.getItemStackCollection().stream().filter(customItem -> customItem.getName().toLowerCase().startsWith(args[2].toLowerCase())).forEach(customItem -> {
-                list.add(customItem.getName());
+            CustomItem.getItemStackCollection().stream().filter(customItem -> customItem.name().toLowerCase().startsWith(args[2].toLowerCase())).forEach(customItem -> {
+                list.add(customItem.name());
             });
         } else if (args.length >= 4) {
             return tabGetPlayersName(args, 4);

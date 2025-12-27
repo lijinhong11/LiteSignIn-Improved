@@ -41,7 +41,7 @@ public enum DatabaseTable {
         int number = 0;
         for (DatabaseElement element : elements) {
             number++;
-            builder.append(element.getField()).append(" ").append(element.getType());
+            builder.append(element.field()).append(" ").append(element.type());
             if (!element.isNull()) builder.append(" NOT NULL");
             if (number < elements.size()) builder.append(",");
         }
@@ -55,7 +55,7 @@ public enum DatabaseTable {
         int number = 0;
         for (DatabaseElement element : elements) {
             number++;
-            builder.append(element.getField()).append(" ").append(element.getType());
+            builder.append(element.field()).append(" ").append(element.type());
             if (!element.isNull()) builder.append(" NOT NULL");
             if (number < elements.size()) builder.append(",");
         }
@@ -71,7 +71,7 @@ public enum DatabaseTable {
         StringBuilder builder = new StringBuilder();
         boolean non = true;
         for (DatabaseElement element : elements) {
-            if (element.isPrimaryKey()) {
+            if (element.primaryKey()) {
                 non = false;
                 break;
             }
@@ -79,8 +79,8 @@ public enum DatabaseTable {
         if (non) return builder.toString();
         builder.append(", PRIMARY KEY (");
         List<String> primaryKeys = new ArrayList<>();
-        elements.stream().filter(element -> element.isPrimaryKey()).forEach(element -> {
-            primaryKeys.add(element.getField());
+        elements.stream().filter(DatabaseElement::primaryKey).forEach(element -> {
+            primaryKeys.add(element.field());
         });
         if (!primaryKeys.isEmpty()) {
             builder.append(primaryKeys.toString(), 1, primaryKeys.toString().length() - 1);

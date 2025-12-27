@@ -1,7 +1,9 @@
 package studio.trc.bukkit.litesignin.util;
 
+import lombok.Getter;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
+import org.jetbrains.annotations.Nullable;
 import studio.trc.bukkit.litesignin.api.Storage;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
@@ -10,11 +12,10 @@ import studio.trc.bukkit.litesignin.queue.SignInQueue;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class PlaceholderAPIImpl
-        extends PlaceholderExpansion {
+public class PlaceholderAPIImpl extends PlaceholderExpansion {
+    @Getter
     private static final PlaceholderAPIImpl instance = new PlaceholderAPIImpl();
-    private static final Map<UUID, Map<String, String>> cacheOfPlayers = new HashMap();
-    private static final Map<String, String> cacheOfServer = new HashMap();
+    private static final Map<UUID, Map<String, String>> cacheOfPlayers = new HashMap<>();
     private static long cacheOfUpdateTime = System.currentTimeMillis();
     private final Random random = new Random();
 
@@ -22,14 +23,9 @@ public class PlaceholderAPIImpl
         super();
     }
 
-    public static PlaceholderAPIImpl getInstance() {
-        return instance;
-    }
-
     public static void checkUpdate() {
         if (cacheOfUpdateTime < System.currentTimeMillis()) {
             cacheOfPlayers.clear();
-            cacheOfServer.clear();
             cacheOfUpdateTime = System.currentTimeMillis() + (long) (ConfigurationUtil.getConfig(ConfigurationType.CONFIG).getDouble("PlaceholderAPI.Cache-Update-Delay") * 1000);
         }
     }
@@ -45,8 +41,8 @@ public class PlaceholderAPIImpl
                 return "0";
             }
             try {
-                int number1 = Integer.valueOf(randomValue[1]);
-                int number2 = Integer.valueOf(randomValue[2]);
+                int number1 = Integer.parseInt(randomValue[1]);
+                int number2 = Integer.parseInt(randomValue[2]);
                 if (number1 == number2) {
                     return String.valueOf(number1);
                 } else if (number1 > number2) {
@@ -59,9 +55,8 @@ public class PlaceholderAPIImpl
             }
         }
         UUID uuid = player.getUniqueId();
-        if (cacheOfPlayers.get(uuid) == null) {
-            cacheOfPlayers.put(uuid, new HashMap());
-        }
+        cacheOfPlayers.computeIfAbsent(uuid, k -> new HashMap<>());
+
         if (cacheOfPlayers.get(uuid).get(identifier) != null) {
             return cacheOfPlayers.get(uuid).get(identifier);
         }
@@ -85,8 +80,8 @@ public class PlaceholderAPIImpl
             } else {
                 String[] time = identifier.split("_");
                 try {
-                    result = String.valueOf(data.getCumulativeNumberOfMonth(Integer.valueOf(time[3]), Integer.valueOf(time[4])));
-                } catch (Throwable t) {
+                    result = String.valueOf(data.getCumulativeNumberOfMonth(Integer.parseInt(time[3]), Integer.parseInt(time[4])));
+                } catch (Throwable ignored) {
                 }
             }
         } else if (identifier.startsWith("today_online_time")) {
@@ -122,8 +117,12 @@ public class PlaceholderAPIImpl
         return result;
     }
 
-    @Override
+
     public String getPlugin() {
+        return "LiteSignIn";
+    }
+
+    public String getRequiredPlugin() {
         return "LiteSignIn";
     }
 

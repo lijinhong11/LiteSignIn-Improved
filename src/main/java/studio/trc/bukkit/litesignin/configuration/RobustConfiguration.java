@@ -109,13 +109,11 @@ public class RobustConfiguration {
         return config.get(path) != null ? getString(path) : def;
     }
 
-    public List getList(String path) {
+    public List<?> getList(String path) {
         if (config.get(path) == null) {
             repairConfigurationSection(path);
-            return config.getList(path);
-        } else {
-            return config.getList(path);
         }
+        return config.getList(path);
     }
 
     public List<String> getStringList(String path) {
@@ -130,19 +128,15 @@ public class RobustConfiguration {
     public List<Integer> getIntegerList(String path) {
         if (config.get(path) == null) {
             repairConfigurationSection(path);
-            return config.getIntegerList(path);
-        } else {
-            return config.getIntegerList(path);
         }
+        return config.getIntegerList(path);
     }
 
     public ItemStack getItemStack(String path) {
         if (config.get(path) == null) {
             repairConfigurationSection(path);
-            return config.getItemStack(path);
-        } else {
-            return config.getItemStack(path);
         }
+        return config.getItemStack(path);
     }
 
     public ItemStack getItemStack(String path, ItemStack def) {

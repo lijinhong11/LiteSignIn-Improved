@@ -219,7 +219,7 @@ public final class MySQLStorage
         Player player = Bukkit.getPlayer(uuid);
         if (player == null) return;
         if (ConfigurationUtil.getConfig(ConfigurationType.CONFIG).getBoolean("Enable-Multi-Group-Reward")) {
-            getAllGroup().stream().forEach(group -> {
+            getAllGroup().forEach(group -> {
                 int queue = SignInQueue.getInstance().getRank(uuid);
                 int continuousSignIn = getContinuousSignIn();
                 int totalNumber = getCumulativeNumber();

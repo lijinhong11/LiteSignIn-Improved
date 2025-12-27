@@ -35,7 +35,7 @@ public abstract class SignInRewardUtil
                 try {
                     switch (SignInRewardTask.valueOf(taskName.toUpperCase())) {
                         case ITEMS_REWARD: {
-                            getRewardItems(player).stream().forEach(item -> {
+                            getRewardItems(player).forEach(item -> {
                                 if (player.getInventory().firstEmpty() != -1) {
                                     player.getInventory().addItem(item);
                                 } else {
@@ -45,11 +45,11 @@ public abstract class SignInRewardUtil
                             break;
                         }
                         case COMMANDS_EXECUTION: {
-                            getCommands().stream().forEach(commands -> commands.runWithThePlayer(player));
+                            getCommands().forEach(commands -> commands.runWithThePlayer(player));
                             break;
                         }
                         case MESSAGES_SENDING: {
-                            getMessages().stream().forEach(messages -> {
+                            getMessages().forEach(messages -> {
                                 Map<String, String> placeholders = MessageUtil.getDefaultPlaceholders();
                                 placeholders.put("{continuous}", String.valueOf(playerData.getContinuousSignIn()));
                                 placeholders.put("{queue}", queue);
@@ -60,8 +60,8 @@ public abstract class SignInRewardUtil
                             break;
                         }
                         case BROADCAST_MESSAGES_SENDING: {
-                            getBroadcastMessages().stream().forEach(messages -> {
-                                Bukkit.getOnlinePlayers().stream().forEach(players -> {
+                            getBroadcastMessages().forEach(messages -> {
+                                Bukkit.getOnlinePlayers().forEach(players -> {
                                     Map<String, String> placeholders = MessageUtil.getDefaultPlaceholders();
                                     placeholders.put("{continuous}", String.valueOf(playerData.getContinuousSignIn()));
                                     placeholders.put("{queue}", queue);
@@ -73,7 +73,7 @@ public abstract class SignInRewardUtil
                             break;
                         }
                         case PLAYSOUNDS: {
-                            getSounds().stream().forEach(sounds -> sounds.playSound(player));
+                            getSounds().forEach(sounds -> sounds.playSound(player));
                             break;
                         }
                     }
@@ -96,7 +96,7 @@ public abstract class SignInRewardUtil
     public List<SignInRewardCommand> getCommands(String configPath) {
         List<SignInRewardCommand> list = new ArrayList<>();
         if (ConfigurationUtil.getConfig(ConfigurationType.REWARD_SETTINGS).contains(configPath)) {
-            ConfigurationUtil.getConfig(ConfigurationType.REWARD_SETTINGS).getStringList(configPath).stream().forEach(commands -> {
+            ConfigurationUtil.getConfig(ConfigurationType.REWARD_SETTINGS).getStringList(configPath).forEach(commands -> {
                 if (commands.toLowerCase().startsWith("server:")) {
                     list.add(new SignInRewardCommand(SignInRewardCommandType.SERVER, commands.substring(7)));
                 } else if (commands.toLowerCase().startsWith("op:")) {
@@ -143,7 +143,7 @@ public abstract class SignInRewardUtil
                 ItemMeta im = is.getItemMeta();
                 if (config.contains("Manual-Settings." + itemdata[0] + ".Lore")) {
                     List<String> lore = new ArrayList<>();
-                    config.getStringList("Manual-Settings." + itemdata[0] + ".Lore").stream().forEach(lores -> lore.add(ColorUtils.toColor(MessageUtil.toPlaceholderAPIResult(player, lores))));
+                    config.getStringList("Manual-Settings." + itemdata[0] + ".Lore").forEach(lores -> lore.add(ColorUtils.toColor(MessageUtil.toPlaceholderAPIResult(player, lores))));
                     im.setLore(lore);
                 }
                 if (config.contains("Manual-Settings." + itemdata[0] + ".Enchantment")) {
@@ -187,7 +187,7 @@ public abstract class SignInRewardUtil
         List<SignInSound> sounds = new ArrayList<>();
         RobustConfiguration config = ConfigurationUtil.getConfig(ConfigurationType.REWARD_SETTINGS);
         if (config.contains(configPath)) {
-            config.getStringList(configPath).stream().forEach((value) -> {
+            config.getStringList(configPath).forEach((value) -> {
                 String[] args = value.split("-");
                 try {
                     Sound sound = Sound.valueOf(args[0].toUpperCase());

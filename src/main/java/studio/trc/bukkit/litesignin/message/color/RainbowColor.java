@@ -8,7 +8,6 @@ import studio.trc.bukkit.litesignin.message.tag.TagContentInfo;
 import java.awt.*;
 import java.util.List;
 
-
 public class RainbowColor
         implements FunctionalColor {
     @Getter
@@ -39,7 +38,7 @@ public class RainbowColor
                 offsetX = null;
                 offsetY = null;
             }
-            ChatColor[] colors = makeRainbow(text.length(), offsetX != null ? Float.valueOf(offsetX) : 0F, offsetY != null ? Float.valueOf(offsetY) : 20F, reverse);
+            ChatColor[] colors = makeRainbow(text.length(), offsetX != null ? Float.parseFloat(offsetX) : 0F, offsetY != null ? Float.parseFloat(offsetY) : 20F, reverse);
             content = tagContent.replace(content, (tagContent.getCloseTag() != null ? "<previousColor>" : "") + ColorUtils.coloring(text, colors, ColorUtils.getPreviousTypeface(original, tagContent.getStartPosition())) + (tagContent.getCloseTag() != null ? "</previousColor>" : ""));
         }
         return content;

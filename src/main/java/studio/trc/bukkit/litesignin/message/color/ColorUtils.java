@@ -2,7 +2,6 @@ package studio.trc.bukkit.litesignin.message.color;
 
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 import studio.trc.bukkit.litesignin.message.tag.TagContentExtractor;
 import studio.trc.bukkit.litesignin.message.tag.TagContentInfo;
 
@@ -123,14 +122,13 @@ public class ColorUtils {
     }
 
     /**
-     * 1.15 below: Classic color
+     * 1.15 below: Classic color (NOT SUPPORTED)
      * 1.16 above: Hex color & classic color
      *
      * @return
      */
     public static boolean isSupportsRGBVersions() {
-        return !Bukkit.getBukkitVersion().startsWith("1.7") && !Bukkit.getBukkitVersion().startsWith("1.8") && !Bukkit.getBukkitVersion().startsWith("1.9") && !Bukkit.getBukkitVersion().startsWith("1.10") &&
-                !Bukkit.getBukkitVersion().startsWith("1.11") && !Bukkit.getBukkitVersion().startsWith("1.12") && !Bukkit.getBukkitVersion().startsWith("1.13") && !Bukkit.getBukkitVersion().startsWith("1.14") && !Bukkit.getBukkitVersion().startsWith("1.15");
+        return true;
     }
 
     /**
@@ -157,7 +155,7 @@ public class ColorUtils {
             //Hexadecimal coloring
             List<String> hexadecimalColors = getHexadecimalColors(content);
             for (String color : hexadecimalColors) {
-                content = content.replace(color, isSupportsRGBVersions() ? ChatColor.of(color).toString() : ChatColor.getByChar(toNearestColor(color)).toString());
+                content = content.replace(color, ChatColor.of(color).toString());
             }
             return content;
         } catch (Exception ex) {

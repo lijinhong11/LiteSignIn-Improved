@@ -1,19 +1,20 @@
 package studio.trc.bukkit.litesignin.event.custom;
 
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 import studio.trc.bukkit.litesignin.util.SignInDate;
 
 import java.util.UUID;
 
-public class PlayerSignInEvent
-        extends Event
-        implements Cancellable {
+public class PlayerSignInEvent extends Event implements Cancellable {
     public static HandlerList handlers = new HandlerList();
     private final UUID uuid;
+    @Getter
     private final SignInDate date;
     private final boolean usingRetroactiveCard;
     private boolean cancelled = false;
@@ -36,16 +37,12 @@ public class PlayerSignInEvent
         return Bukkit.getPlayer(uuid);
     }
 
-    public SignInDate getDate() {
-        return date;
-    }
-
     public boolean usingRetroactiveCard() {
         return usingRetroactiveCard;
     }
 
     @Override
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return handlers;
     }
 

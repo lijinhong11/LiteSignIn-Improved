@@ -409,6 +409,9 @@ public class SignInGUI {
                             MessageUtil.toPlaceholderAPIResult(player, section.getString(items + ".Display-Name"))));
                 }
                 if (section.get(items + ".Item-Model") != null) {
+                    if (Bukkit.getUnsafe().getProtocolVersion() < 769) { //1.21.4
+                        return;
+                    }
                     im.setItemModel(NamespacedKey.fromString(
                             MessageUtil.toPlaceholderAPIResult(player, section.getString(items + ".Item-Model", ""))));
                 }
@@ -553,11 +556,12 @@ public class SignInGUI {
     }
 
     private static void setItemModel(String configPath, ItemStack is, int day) {
-        String version = Bukkit.getBukkitVersion();
-        if (!version.startsWith("1.21"))
+        if (is.getItemMeta() == null) {
             return;
-        if (is.getItemMeta() == null)
+        }
+        if (Bukkit.getUnsafe().getProtocolVersion() < 769) { //1.21.4
             return;
+        }
         ItemMeta im = is.getItemMeta();
         String name = ConfigurationUtil.getConfig(ConfigurationType.GUI_SETTINGS).getString(configPath);
         if (im == null || name == null)

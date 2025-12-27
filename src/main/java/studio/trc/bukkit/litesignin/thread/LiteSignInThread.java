@@ -16,8 +16,7 @@ import studio.trc.bukkit.litesignin.util.PluginControl;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LiteSignInThread
-        extends Thread {
+public class LiteSignInThread extends Thread {
     @Getter
     private static LiteSignInThread taskThread = null;
     @Getter

@@ -1,11 +1,13 @@
 package studio.trc.bukkit.litesignin.event.custom;
 
+import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 
-public class SignInGUICloseEvent
-        extends Event {
+@Getter
+public class SignInGUICloseEvent extends Event {
     public static HandlerList handlers = new HandlerList();
 
     private final Player player;
@@ -18,12 +20,8 @@ public class SignInGUICloseEvent
         return handlers;
     }
 
-    public Player getPlayer() {
-        return player;
-    }
-
     @Override
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return handlers;
     }
 }
