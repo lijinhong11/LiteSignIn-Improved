@@ -1,5 +1,6 @@
 package studio.trc.bukkit.litesignin.queue;
 
+import lombok.Getter;
 import studio.trc.bukkit.litesignin.util.SignInDate;
 
 import java.util.UUID;
@@ -7,6 +8,7 @@ import java.util.UUID;
 public class SignInQueueElement {
     private final UUID uuid;
     private final SignInDate date;
+    @Getter
     private String name = null;
 
     public SignInQueueElement(UUID uuid, SignInDate date) {
@@ -22,10 +24,6 @@ public class SignInQueueElement {
 
     public UUID getUUID() {
         return uuid;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public SignInDate getSignInDate() {

@@ -1,5 +1,6 @@
 package studio.trc.bukkit.litesignin.queue;
 
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -26,9 +27,10 @@ import java.util.logging.Logger;
  */
 public class SignInQueue
         extends ArrayList<SignInQueueElement> {
-    private static final Map<SignInDate, SignInQueue> cache = new HashMap();
-    private static final Map<SignInDate, Long> lastUpdateTime = new HashMap();
+    private static final Map<SignInDate, SignInQueue> cache = new HashMap<>();
+    private static final Map<SignInDate, Long> lastUpdateTime = new HashMap<>();
     private final FileConfiguration yamlFile = new YamlConfiguration();
+    @Getter
     private final SignInDate date;
 
     public SignInQueue(SignInDate date) {
@@ -37,17 +39,7 @@ public class SignInQueue
 
     public static SignInQueue getInstance() {
         SignInDate date = SignInDate.getInstance(new Date());
-        for (SignInDate dates : cache.keySet()) {
-            if (dates.equals(date)) {
-                SignInQueue queue = cache.get(dates);
-                queue.checkUpdate();
-                return queue;
-            }
-        }
-        SignInQueue queue = new SignInQueue(date);
-        cache.put(date, queue);
-        queue.checkUpdate();
-        return queue;
+        return getInstance(date);
     }
 
     public static SignInQueue getInstance(SignInDate date) {
@@ -62,10 +54,6 @@ public class SignInQueue
         cache.put(date, queue);
         queue.checkUpdate();
         return queue;
-    }
-
-    public SignInDate getDate() {
-        return date;
     }
 
     public void loadQueue() {
@@ -95,7 +83,7 @@ public class SignInQueue
                                             minute = targetDate.getMinute();
                                             second = targetDate.getSecond();
                                         }
-                                        if (hour != null && minute != null && second != null) {
+                                        if (hour != null) {
                                             time = SignInDate.getInstance(date.getYear(), date.getMonth(), date.getDay(), hour, minute, second);
                                         } else {
                                             time = SignInDate.getInstance(date.getYear(), date.getMonth(), date.getDay());
@@ -133,7 +121,7 @@ public class SignInQueue
                                             minute = targetDate.getMinute();
                                             second = targetDate.getSecond();
                                         }
-                                        if (hour != null && minute != null && second != null) {
+                                        if (hour != null) {
                                             time = SignInDate.getInstance(date.getYear(), date.getMonth(), date.getDay(), hour, minute, second);
                                         } else {
                                             time = SignInDate.getInstance(date.getYear(), date.getMonth(), date.getDay());
@@ -161,7 +149,7 @@ public class SignInQueue
                 } catch (InvalidConfigurationException ex) {
                     Logger.getLogger(SignInQueue.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                if (!yamlFile.contains("Date") || !SignInDate.getInstance(yamlFile.getString("Date")).equals(date)) {
+                if (!yamlFile.contains("Date") || !date.equals(SignInDate.getInstance(yamlFile.getString("Date")))) {
                     yamlFile.set("Date", SignInDate.getInstance(date.getYear(), date.getMonth(), date.getDay()).getDataText(true));
                     yamlFile.set("Record", null);
                     saveData();
@@ -191,7 +179,7 @@ public class SignInQueue
 
     public void addRecord(UUID uuid, SignInDate date) {
         SignInDate today = SignInDate.getInstance(new Date());
-        if (!yamlFile.contains("Date") || !SignInDate.getInstance(yamlFile.getString("Date")).equals(today)) {
+        if (!yamlFile.contains("Date") || !Objects.equals(today, SignInDate.getInstance(yamlFile.getString("Date")))) {
             yamlFile.set("Date", SignInDate.getInstance(date.getYear(), date.getMonth(), date.getDay()).getDataText(true));
             yamlFile.set("Record", null);
             clear();

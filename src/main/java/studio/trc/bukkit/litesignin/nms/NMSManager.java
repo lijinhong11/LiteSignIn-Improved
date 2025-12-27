@@ -4,8 +4,11 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.ApiStatus;
 import studio.trc.bukkit.litesignin.util.AdventureUtils;
 
+@ApiStatus.ScheduledForRemoval
+//It is a shit.
 public class NMSManager {
     public static Class<?> craftItemStack;
     public static Class<?> nbtTagCompound = null;
