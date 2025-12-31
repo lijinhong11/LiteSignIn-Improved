@@ -12,6 +12,11 @@ import java.io.*;
 import java.util.Arrays;
 import java.util.Map;
 
+@Deprecated(forRemoval = true)
+/*
+  为什么一个enum要干这么多没用的事
+  而且配置还tm分两个版本
+ */
 public enum ConfigurationType {
     /**
      * Config.yml
@@ -118,8 +123,7 @@ public enum ConfigurationType {
             }
             return Arrays.stream(ConfigurationType.values()).filter(type -> type.getFolder().equalsIgnoreCase(folder.toString()) && type.getFileName().equalsIgnoreCase(fileName)).findFirst().orElse(null);
         } else {
-            String fileName = filePath;
-            return Arrays.stream(ConfigurationType.values()).filter(type -> type.getFileName().equalsIgnoreCase(fileName)).findFirst().orElse(null);
+            return Arrays.stream(ConfigurationType.values()).filter(type -> type.getFileName().equalsIgnoreCase(filePath)).findFirst().orElse(null);
         }
     }
 
@@ -154,13 +158,12 @@ public enum ConfigurationType {
         }
     }
 
-    public boolean reloadConfig() {
+    public void reloadConfig() {
         try (InputStreamReader configFile = new InputStreamReader(new FileInputStream("plugins/LiteSignIn/" + folder + fileName), LiteSignInProperties.getMessage("Charset"))) {
             config.load(configFile);
             if (universal) {
                 saveLanguageConfig(this);
             }
-            return true;
         } catch (IOException | InvalidConfigurationException ex) {
             File oldFile = new File("plugins/LiteSignIn/" + folder + fileName + ".old");
             File file = new File("plugins/LiteSignIn/" + folder + fileName);
@@ -179,7 +182,6 @@ public enum ConfigurationType {
                 ex1.printStackTrace();
             }
         }
-        return false;
     }
 
     public String getLocalFilePath() {
@@ -191,7 +193,7 @@ public enum ConfigurationType {
                 ConfigurationVersion specialVersion = Arrays.stream(versions).filter(version -> version.getVersions().length == 0 || Arrays.stream(version.getVersions()).anyMatch(type -> nms.equalsIgnoreCase(type.name()))).findFirst().get();
                 return specialVersion.getFolder() + specialVersion.getFileName();
             } catch (Exception ex) {
-                ConfigurationVersion specialVersion = Arrays.stream(versions).filter(version -> version.getVersions().length == 0).findFirst().get();
+                ConfigurationVersion specialVersion = Arrays.stream(versions).filter(version -> version.getVersions().length == 0).findFirst().orElseThrow();
                 return specialVersion.getFolder() + specialVersion.getFileName();
             }
         }

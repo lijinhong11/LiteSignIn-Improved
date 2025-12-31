@@ -13,7 +13,6 @@ import studio.trc.bukkit.litesignin.Main;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
 import studio.trc.bukkit.litesignin.configuration.RobustConfiguration;
 import studio.trc.bukkit.litesignin.message.color.ColorUtils;
-import studio.trc.bukkit.litesignin.nms.NMSManager;
 import studio.trc.bukkit.litesignin.util.AdventureUtils;
 
 import java.util.ArrayList;
@@ -22,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("deprecation")
 public class MessageUtil {
     private static final Map<String, String> defaultPlaceholders = new HashMap<>();
 
@@ -44,11 +44,11 @@ public class MessageUtil {
         sendAdventureMessage(sender, message, placeholders, null);
     }
 
-    public static void sendAdventureMessage(CommandSender sender, String message, Map<String, String> placeholders, Map<String, Object> additionalComponents) {
+    public static void sendAdventureMessage(CommandSender sender, String message, Map<String, String> placeholders, Map<String, Component> additionalComponents) {
         if (sender == null) return;
         String sample = replacePlaceholders(sender, message, placeholders);
         if (additionalComponents != null && !additionalComponents.isEmpty()) {
-            sendAdventureJSONMessage(sender, MessageEditor.createAdventureJSONMessage(sender, sample, AdventureUtils.toAdventureComponents(additionalComponents)));
+            sendAdventureJSONMessage(sender, MessageEditor.createAdventureJSONMessage(sender, sample, additionalComponents));
         } else {
             sender.sendMessage(sample);
         }
@@ -58,7 +58,7 @@ public class MessageUtil {
         if (sender == null) return;
         String sample = replacePlaceholders(sender, message, placeholders);
         Map<String, Component> components = additionalComponents.entrySet()
-                .stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> AdventureUtils.toComponent(entry.getValue().getAdventureComponent(additionalPlaceholders))));
+                .stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getAdventureComponent(additionalPlaceholders)));
         if (!components.isEmpty()) {
             sendAdventureJSONMessage(sender, MessageEditor.createAdventureJSONMessage(sender, sample, components));
         } else {
@@ -67,13 +67,13 @@ public class MessageUtil {
     }
 
     public static void sendMessageWithItem(CommandSender sender, String message, Map<String, String> placeholders, ItemStack item) {
-        Map<String, Object> json = new HashMap<>();
-        json.put("%item%", NMSManager.getAdventureJSONItemStack(item));
+        Map<String, Component> json = new HashMap<>();
+        json.put("%item%", AdventureUtils.getAdventureHoverItemStack(item));
         sendAdventureMessage(sender, message, placeholders, json);
     }
 
     public static void sendMessageWithJSONComponent(CommandSender sender, String message, Map<String, String> placeholders, String componentKey, JSONComponent jsonComponent) {
-        Map<String, Object> json = new HashMap<>();
+        Map<String, Component> json = new HashMap<>();
         json.put(componentKey, jsonComponent.getAdventureComponent());
         sendAdventureMessage(sender, message, placeholders, json);
     }
@@ -86,7 +86,7 @@ public class MessageUtil {
         messages.forEach(rawMessage -> sendMessage(sender, rawMessage, placeholders));
     }
 
-    public static void sendAdventureMessage(CommandSender sender, List<String> messages, Map<String, String> placeholders, Map<String, Object> jsonComponents) {
+    public static void sendAdventureMessage(CommandSender sender, List<String> messages, Map<String, String> placeholders, Map<String, Component> jsonComponents) {
         messages.forEach(rawMessage -> sendAdventureMessage(sender, rawMessage, placeholders, jsonComponents));
     }
 
@@ -98,7 +98,7 @@ public class MessageUtil {
         sendAdventureMessage(sender, configuration, configPath, placeholders, null);
     }
 
-    public static void sendAdventureMessage(CommandSender sender, RobustConfiguration configuration, String configPath, Map<String, String> placeholders, Map<String, Object> jsonComponents) {
+    public static void sendAdventureMessage(CommandSender sender, RobustConfiguration configuration, String configPath, Map<String, String> placeholders, Map<String, Component> jsonComponents) {
         List<String> messages = configuration.getStringList(getLanguage() + "." + configPath);
         if (messages.isEmpty() && !ConfigurationType.MESSAGES.getRobustConfig().getString(getLanguage() + "." + configPath).equals("[]")) {
             sendAdventureMessage(sender, configuration.getString(getLanguage() + "." + configPath), placeholders, jsonComponents);
@@ -119,7 +119,7 @@ public class MessageUtil {
         sendMessage(Bukkit.getConsoleSender(), type.getRobustConfig(), configPath, placeholders);
     }
 
-    public static void sendConsoleAdventureMessage(String configPath, ConfigurationType type, Map<String, String> placeholders, Map<String, Object> jsonComponents) {
+    public static void sendConsoleAdventureMessage(String configPath, ConfigurationType type, Map<String, String> placeholders, Map<String, Component> jsonComponents) {
         sendAdventureMessage(Bukkit.getConsoleSender(), type.getRobustConfig(), configPath, placeholders, jsonComponents);
     }
 
@@ -131,18 +131,18 @@ public class MessageUtil {
         sendMessage(sender, ConfigurationType.MESSAGES.getRobustConfig(), "Command-Messages." + configPath, placeholders);
     }
 
-    public static void sendCommandAdventureMessage(CommandSender sender, String configPath, Map<String, String> placeholders, Map<String, Object> jsonComponents) {
+    public static void sendCommandAdventureMessage(CommandSender sender, String configPath, Map<String, String> placeholders, Map<String, Component> jsonComponents) {
         sendAdventureMessage(sender, ConfigurationType.MESSAGES.getRobustConfig(), "Command-Messages." + configPath, placeholders, jsonComponents);
     }
 
     public static void sendCommandMessageWithItem(CommandSender sender, String configPath, Map<String, String> placeholders, ItemStack item) {
-        Map<String, Object> json = new HashMap<>();
-        json.put("%item%", NMSManager.getAdventureJSONItemStack(item));
+        Map<String, Component> json = new HashMap<>();
+        json.put("%item%", AdventureUtils.getAdventureHoverItemStack(item));
         sendCommandAdventureMessage(sender, configPath, placeholders, json);
     }
 
     public static void sendCommandMessageWithJSONComponent(CommandSender sender, String configPath, Map<String, String> placeholders, String componentKey, JSONComponent jsonComponent) {
-        Map<String, Object> json = new HashMap<>();
+        Map<String, Component> json = new HashMap<>();
         json.put(componentKey, jsonComponent.getAdventureComponent());
         sendCommandAdventureMessage(sender, configPath, placeholders, json);
     }
@@ -298,6 +298,7 @@ public class MessageUtil {
     /**
      * Plugin langauge
      */
+    @Getter
     public enum Language {
 
         /**
@@ -342,8 +343,5 @@ public class MessageUtil {
             }
         }
 
-        public String getFolderName() {
-            return folderName;
-        }
     }
 }

@@ -15,7 +15,7 @@ public class MessageEditor {
         Component component = null;
         for (MessageSection section : sections) {
             if (section.isPlaceholder()) {
-                component = component == null ? AdventureUtils.toComponent(section.getAdventureComponent()) : component.append(AdventureUtils.toComponent(section.getAdventureComponent()));
+                component = component == null ? section.getAdventureComponent() : component.append(section.getAdventureComponent());
             } else {
                 String text = MessageUtil.toPlaceholderAPIResult(sender, section.getText()).replace("/n", "\n");
                 component = component == null ? AdventureUtils.serializeText(text) : component.append(AdventureUtils.serializeText(text));

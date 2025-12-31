@@ -18,7 +18,6 @@ import studio.trc.bukkit.litesignin.event.Join;
 import studio.trc.bukkit.litesignin.event.Menu;
 import studio.trc.bukkit.litesignin.event.Quit;
 import studio.trc.bukkit.litesignin.message.MessageUtil;
-import studio.trc.bukkit.litesignin.nms.NMSManager;
 import studio.trc.bukkit.litesignin.thread.LiteSignInThread;
 import studio.trc.bukkit.litesignin.util.LiteSignInProperties;
 import studio.trc.bukkit.litesignin.util.PluginControl;
@@ -57,7 +56,6 @@ public class Main
         registerCommandExecutor();
         registerEvent();
         PluginControl.reload();
-        NMSManager.reloadNMS();
         LiteSignInProperties.sendOperationMessage("PluginEnabledSuccessfully", MessageUtil.getDefaultPlaceholders());
 
         //It will run after the server is started.

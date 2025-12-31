@@ -4,7 +4,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import studio.trc.bukkit.litesignin.nms.NMSManager;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,16 +24,12 @@ public class AdventureUtils {
         return component.clickEvent(event);
     }
 
-    public static Component toComponent(Object obj) {
-        return (Component) obj;
+    public static Component toComponent(Component obj) {
+        return obj;
     }
 
     public static Component serializeText(String text) {
         return LegacyComponentSerializer.legacySection().deserialize(text);
-    }
-
-    public static Map<String, Component> toAdventureComponents(Map<String, Object> components) {
-        return components.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, value -> toComponent(value.getValue())));
     }
 
     public static HoverEvent<Component> showText(String text) {
@@ -50,16 +47,24 @@ public class AdventureUtils {
         };
     }
 
-    public static Map<String, Object> getItemDisplay(List<CustomItem> itemList) {
-        Map<String, Object> json = new HashMap<>();
+    public static Map<String, Component> getItemDisplay(List<CustomItem> itemList) {
+        Map<String, Component> json = new HashMap<>();
         Component component = Component.text("");
         for (int i = 0; i < itemList.size(); i++) {
-            component = component.append(AdventureUtils.toComponent(NMSManager.getAdventureJSONItemStack(itemList.get(i).itemStack())));
+            component = component.append(getAdventureHoverItemStack(itemList.get(i).itemStack()));
             if (i != itemList.size() - 1) {
                 component = component.append(Component.text(", "));
             }
         }
         json.put("%list%", component);
         return json;
+    }
+
+    public static Component getAdventureHoverItemStack(ItemStack item) {
+        if (item != null && !item.getType().equals(Material.AIR)) {
+            String translationKey = item.getType().translationKey();
+            return Component.translatable(translationKey).hoverEvent(item);
+        }
+        return Component.text("");
     }
 }

@@ -2,13 +2,9 @@ package studio.trc.bukkit.litesignin.util;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
-import studio.trc.bukkit.litesignin.Main;
 import studio.trc.bukkit.litesignin.message.MessageUtil;
 import studio.trc.bukkit.litesignin.message.color.ColorUtils;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 

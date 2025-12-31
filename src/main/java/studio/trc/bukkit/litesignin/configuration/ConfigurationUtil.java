@@ -24,9 +24,8 @@ public class ConfigurationUtil {
         }
     }
 
-    public static boolean reloadConfig(ConfigurationType fileType) {
+    public static void reloadConfig(ConfigurationType fileType) {
         fileType.saveResource();
-        return fileType.reloadConfig();
+        fileType.reloadConfig();
     }
-
 }
