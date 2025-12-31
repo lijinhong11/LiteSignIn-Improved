@@ -1,4 +1,4 @@
-package studio.trc.bukkit.litesignin.event.custom;
+package studio.trc.bukkit.litesignin.api.events;
 
 import lombok.Getter;
 import org.bukkit.entity.Player;

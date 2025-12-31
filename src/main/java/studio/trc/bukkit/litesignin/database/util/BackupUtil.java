@@ -8,7 +8,7 @@ import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
 import studio.trc.bukkit.litesignin.database.storage.MySQLStorage;
 import studio.trc.bukkit.litesignin.database.storage.SQLiteStorage;
 import studio.trc.bukkit.litesignin.database.storage.YamlStorage;
-import studio.trc.bukkit.litesignin.event.Menu;
+import studio.trc.bukkit.litesignin.event.MenuListener;
 import studio.trc.bukkit.litesignin.message.MessageUtil;
 import studio.trc.bukkit.litesignin.util.PluginControl;
 import studio.trc.bukkit.litesignin.util.SignInDate;
@@ -22,7 +22,7 @@ public class BackupUtil {
     private static CommandSender[] backupUsers = {};
     private static boolean backingup = false;
     public static Runnable backupMethod = () -> {
-        Bukkit.getOnlinePlayers().stream().filter(ps -> Menu.menuOpening.containsKey(ps.getUniqueId())).forEachOrdered(Player::closeInventory);
+        Bukkit.getOnlinePlayers().stream().filter(ps -> MenuListener.menuOpening.containsKey(ps.getUniqueId())).forEachOrdered(Player::closeInventory);
         try {
             if (!ConfigurationUtil.getConfig(ConfigurationType.CONFIG).getBoolean("Database-Management.Backup.Enabled")) {
                 return;

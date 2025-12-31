@@ -2,12 +2,16 @@ package studio.trc.bukkit.litesignin.event;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import studio.trc.bukkit.litesignin.Main;
 import studio.trc.bukkit.litesignin.api.Storage;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
+import studio.trc.bukkit.litesignin.database.storage.MySQLStorage;
+import studio.trc.bukkit.litesignin.database.storage.SQLiteStorage;
 import studio.trc.bukkit.litesignin.database.util.BackupUtil;
 import studio.trc.bukkit.litesignin.database.util.RollBackUtil;
 import studio.trc.bukkit.litesignin.message.JSONComponent;
@@ -19,7 +23,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class Join implements Listener {
+public class PlayerListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onJoin(PlayerJoinEvent event) {
         if (BackupUtil.isBackingUp() || RollBackUtil.isRollingback()) {
@@ -92,6 +96,20 @@ public class Join implements Listener {
                     });
                 }
             }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
+    public void quit(PlayerQuitEvent e) {
+        Player player = e.getPlayer();
+        if (ConfigurationUtil.getConfig(ConfigurationType.CONFIG).getBoolean("Online-Duration-Condition.Enabled")) {
+            OnlineTimeRecord.savePlayerOnlineTime(player);
+        }
+        Storage.getPlayer(player).saveData();
+        if (PluginControl.useMySQLStorage()) {
+            MySQLStorage.cache.remove(player.getUniqueId());
+        } else if (PluginControl.useSQLiteStorage()) {
+            SQLiteStorage.cache.remove(player.getUniqueId());
         }
     }
 

@@ -6,7 +6,7 @@ import studio.trc.bukkit.litesignin.command.SignInSubCommand;
 import studio.trc.bukkit.litesignin.command.SignInSubCommandType;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
-import studio.trc.bukkit.litesignin.event.Menu;
+import studio.trc.bukkit.litesignin.event.MenuListener;
 import studio.trc.bukkit.litesignin.message.MessageUtil;
 import studio.trc.bukkit.litesignin.util.LiteSignInUtils;
 import studio.trc.bukkit.litesignin.util.PluginControl;
@@ -31,7 +31,7 @@ public class GUICommand
             }
             SignInDate target = SignInDate.getInstance(new Date());
             if (args.length == 1) {
-                Menu.openGUI(player);
+                MenuListener.openGUI(player);
                 MessageUtil.sendCommandMessage(player, "GUI.Normal");
             } else if (args.length == 2) {
                 if (LiteSignInUtils.hasCommandPermission(sender, "Designated-GUI", true)) {
@@ -44,7 +44,7 @@ public class GUICommand
                                 MessageUtil.sendMessage(sender, ConfigurationUtil.getConfig(ConfigurationType.MESSAGES), "GUI-SignIn-Messages.Minimum-GUI-Date", placeholders);
                                 return;
                             }
-                            Menu.openGUI(player, month);
+                            MenuListener.openGUI(player, month);
                             placeholders.put("{month}", String.valueOf(month));
                             MessageUtil.sendCommandMessage(player, "GUI.Normal", placeholders);
                             return;
@@ -89,7 +89,7 @@ public class GUICommand
                         MessageUtil.sendMessage(sender, ConfigurationUtil.getConfig(ConfigurationType.MESSAGES), "GUI-SignIn-Messages.Minimum-GUI-Date", placeholders);
                         return;
                     }
-                    Menu.openGUI(player, month, year);
+                    MenuListener.openGUI(player, month, year);
                     placeholders.put("{month}", String.valueOf(month));
                     placeholders.put("{year}", String.valueOf(year));
                     MessageUtil.sendCommandMessage(player, "GUI.Specified-Year", placeholders);

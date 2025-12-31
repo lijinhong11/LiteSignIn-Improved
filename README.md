@@ -4,6 +4,9 @@ https://www.spigotmc.org/resources/79584/
 # What is LiteSignIn ?
 This is a plug-in for recording player check-in data, and rewards players for check-in. The content of the reward can be completely customized, it can trigger commands, message prompts, item rewards, etc. when signing in. It supports GUI mode, just like a calendar, it is very simple to use.
 
+# Why I improved it?
+The code is absolutely a trash, and I want it to have more features that everyone wanted.
+
 # Current Features
 - Remind to sign in after joining the game  
 - Sign in using command  
@@ -30,18 +33,18 @@ This is a plug-in for recording player check-in data, and rewards players for ch
 And more...  
 
 # Commands
-| Command                                         | Function                                                    |
-|:------------------------------------------------|:------------------------------------------------------------|
-| /signin help                                    | View command help.                                          |
-| /signin reload                                  | Reload configuration files.                                 |
-| /signin gui [month]                             | Open the Sign In GUI menu.                                  |
-| /signin click [Date or playerName] [playerName] | Sign in now, or sign in for historical date.                |
-| /signin save                                    | Save data for all online players.                           |
-| /signin leaderboard [Date] [Page]               | View the sign-in leaderboard for today or a specified date. |
-| /signin database [backup/rollback/confirm]      | Database managements                                        |
-| /signin info [playerName]                       | View player's information.                                  |
-| /signin itemcollection                          | Collection of management items.                             |
-| /signin reward                                  | Directly give the player a sign-in reward.                  |
+| Command                                           | Function                                                    |
+|:--------------------------------------------------|:------------------------------------------------------------|
+| /signin help                                      | View command help.                                          |
+| /signin reload                                    | Reload configuration files.                                 |
+| /signin gui \[month]                              | Open the Sign In GUI menu.                                  |
+| /signin click \[Date or playerName] \[playerName] | Sign in now, or sign in for historical date.                |
+| /signin save                                      | Save data for all online players.                           |
+| /signin leaderboard \[Date] \[Page]               | View the sign-in leaderboard for today or a specified date. |
+| /signin database \[backup/rollback/confirm]       | Database managements                                        |
+| /signin info \[playerName]                        | View player's information.                                  |
+| /signin itemcollection                            | Collection of management items.                             |
+| /signin reward                                    | Directly give the player a sign-in reward.                  |
 
 # PlaceholderAPI's placeholders
 | Placeholder                      | Action                                                       |
@@ -61,7 +64,7 @@ And more...
 | %litesignin_last_second%         | Returns the second of the latest sign-in.                    |
 
 Another placeholders:  
-%litesignin_random_[minimum]_[maximum]% Returns a random value within a specified range of numbers. (This is a placeholder for a gadget type.)
+%litesignin_random_\[minimum]_\[maximum]% Returns a random value within a specified range of numbers. (This is a placeholder for a gadget type.)
 
 # Video
 [![VIDEO](https://img.youtube.com/vi/46L9jBwhQ0Q/0.jpg)](https://www.youtube.com/watch?v=46L9jBwhQ0Q)
@@ -69,7 +72,7 @@ Another placeholders:
 # Statistics
 [![BigImage](https://bstats.org/signatures/bukkit/LiteSignIn.svg)](https://bstats.org/plugin/bukkit/LiteSignIn)
 
-## My Updating Plugins:
+## Origin Author's Updating Plugins:
 **LiteAnnouncer: [https://www.spigotmc.org/resources/84664/](https://www.spigotmc.org/resources/84664/)**  
 **LiteCommandEditor: [https://www.spigotmc.org/resources/117987/](https://www.spigotmc.org/resources/117987/)**  
 **GlobalMarketPlus: [https://www.spigotmc.org/resources/103648/](https://www.spigotmc.org/resources/103648/)**

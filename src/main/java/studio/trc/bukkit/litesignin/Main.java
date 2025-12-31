@@ -14,9 +14,8 @@ import studio.trc.bukkit.litesignin.database.engine.SQLiteEngine;
 import studio.trc.bukkit.litesignin.database.storage.MySQLStorage;
 import studio.trc.bukkit.litesignin.database.storage.SQLiteStorage;
 import studio.trc.bukkit.litesignin.database.util.BackupUtil;
-import studio.trc.bukkit.litesignin.event.Join;
-import studio.trc.bukkit.litesignin.event.Menu;
-import studio.trc.bukkit.litesignin.event.Quit;
+import studio.trc.bukkit.litesignin.event.PlayerListener;
+import studio.trc.bukkit.litesignin.event.MenuListener;
 import studio.trc.bukkit.litesignin.message.MessageUtil;
 import studio.trc.bukkit.litesignin.thread.LiteSignInThread;
 import studio.trc.bukkit.litesignin.util.LiteSignInProperties;
@@ -110,9 +109,9 @@ public class Main
 
     private void registerEvent() {
         PluginManager pm = Bukkit.getPluginManager();
-        pm.registerEvents(new Join(), Main.getInstance());
-        pm.registerEvents(new Menu(), Main.getInstance());
-        pm.registerEvents(new Quit(), Main.getInstance());
+        pm.registerEvents(new PlayerListener(), Main.getInstance());
+        pm.registerEvents(new MenuListener(), Main.getInstance());
+        pm.registerEvents(new QuitListener(), Main.getInstance());
         pm.registerEvents(new WoodSignEvent(), Main.getInstance());
         LiteSignInProperties.sendOperationMessage("PluginListenerRegistered");
     }

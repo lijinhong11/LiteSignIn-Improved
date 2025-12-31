@@ -15,8 +15,8 @@ import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
 import studio.trc.bukkit.litesignin.database.util.BackupUtil;
 import studio.trc.bukkit.litesignin.database.util.RollBackUtil;
-import studio.trc.bukkit.litesignin.event.custom.SignInGUICloseEvent;
-import studio.trc.bukkit.litesignin.event.custom.SignInGUIOpenEvent;
+import studio.trc.bukkit.litesignin.api.events.SignInGUICloseEvent;
+import studio.trc.bukkit.litesignin.api.events.SignInGUIOpenEvent;
 import studio.trc.bukkit.litesignin.gui.SignInGUI;
 import studio.trc.bukkit.litesignin.gui.SignInGUIColumn;
 import studio.trc.bukkit.litesignin.gui.SignInInventory;
@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class Menu implements Listener {
+public class MenuListener implements Listener {
     public static final Map<UUID, SignInInventory> menuOpening = new HashMap<>();
 
     public static void openGUI(Player player) {

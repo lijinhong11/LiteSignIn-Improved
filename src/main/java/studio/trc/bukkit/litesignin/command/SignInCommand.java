@@ -20,7 +20,7 @@ import java.util.*;
 public class SignInCommand
         implements CommandExecutor, TabCompleter {
     @Getter
-    private static final Map<String, SignInSubCommand> subCommands = new HashMap();
+    private static final Map<String, SignInSubCommand> subCommands = new HashMap<>();
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -35,7 +35,7 @@ public class SignInCommand
         }
         if (args.length == 0) {
             MessageUtil.sendCommandMessage(sender, "Unknown-Command");
-        } else if (args.length >= 1) {
+        } else {
             callSubCommand(sender, args);
         }
         return true;
@@ -85,9 +85,7 @@ public class SignInCommand
         List<String> commands = getCommands(sender);
         if (args != null) {
             List<String> names = new ArrayList<>();
-            commands.stream().filter(command -> command.toLowerCase().startsWith(args.toLowerCase())).forEach(command -> {
-                names.add(command);
-            });
+            commands.stream().filter(command -> command.toLowerCase().startsWith(args.toLowerCase())).forEach(names::add);
             return names;
         }
         return commands;

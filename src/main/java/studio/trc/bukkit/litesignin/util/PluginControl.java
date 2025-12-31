@@ -18,7 +18,7 @@ import studio.trc.bukkit.litesignin.database.engine.SQLiteEngine;
 import studio.trc.bukkit.litesignin.database.storage.MySQLStorage;
 import studio.trc.bukkit.litesignin.database.storage.SQLiteStorage;
 import studio.trc.bukkit.litesignin.database.storage.YamlStorage;
-import studio.trc.bukkit.litesignin.event.Menu;
+import studio.trc.bukkit.litesignin.event.MenuListener;
 import studio.trc.bukkit.litesignin.message.MessageUtil;
 import studio.trc.bukkit.litesignin.message.color.ColorUtils;
 import studio.trc.bukkit.litesignin.queue.SignInQueue;
@@ -58,7 +58,7 @@ public class PluginControl {
             MessageUtil.setEnabledPAPI(false);
             LiteSignInProperties.sendOperationMessage("PlaceholderAPINotFound", MessageUtil.getDefaultPlaceholders());
         }
-        Bukkit.getOnlinePlayers().stream().filter(ps -> Menu.menuOpening.containsKey(ps.getUniqueId())).forEachOrdered(Player::closeInventory);
+        Bukkit.getOnlinePlayers().stream().filter(ps -> MenuListener.menuOpening.containsKey(ps.getUniqueId())).forEachOrdered(Player::closeInventory);
         LiteSignInThread.initialize();
         if (enableSignScript()) {
             WoodSignUtil.loadScripts();

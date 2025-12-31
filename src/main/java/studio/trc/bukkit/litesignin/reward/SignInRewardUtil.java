@@ -1,8 +1,6 @@
 package studio.trc.bukkit.litesignin.reward;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -23,6 +21,7 @@ import studio.trc.bukkit.litesignin.util.PluginControl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public abstract class SignInRewardUtil
         implements SignInReward {
@@ -88,7 +87,7 @@ public abstract class SignInRewardUtil
         List<ItemStack> list = new ArrayList<>();
         RobustConfiguration config = ConfigurationUtil.getConfig(ConfigurationType.REWARD_SETTINGS);
         if (config.contains(configPath)) {
-            config.getStringList(configPath).stream().map(itemData -> getItemFromItemData(player, itemData)).filter(item -> item != null).forEach(list::add);
+            config.getStringList(configPath).stream().map(itemData -> getItemFromItemData(player, itemData)).filter(Objects::nonNull).forEach(list::add);
         }
         return list;
     }
@@ -117,7 +116,7 @@ public abstract class SignInRewardUtil
                 if (itemdata[1].contains("-")) {
                     is.setAmount(PluginControl.getRandom(itemdata[1]));
                 } else {
-                    is.setAmount(Integer.valueOf(itemdata[1]));
+                    is.setAmount(Integer.parseInt(itemdata[1]));
                 }
             } catch (NumberFormatException ex) {
             }
@@ -158,7 +157,7 @@ public abstract class SignInRewardUtil
                     if (itemdata[1].contains("-")) {
                         is.setAmount(PluginControl.getRandom(itemdata[1]));
                     } else {
-                        is.setAmount(Integer.valueOf(itemdata[1]));
+                        is.setAmount(Integer.parseInt(itemdata[1]));
                     }
                 } catch (NumberFormatException ex) {
                     is.setAmount(1);
@@ -171,7 +170,7 @@ public abstract class SignInRewardUtil
                         if (itemdata[1].contains("-")) {
                             is.setAmount(PluginControl.getRandom(itemdata[1]));
                         } else {
-                            is.setAmount(Integer.valueOf(itemdata[1]));
+                            is.setAmount(Integer.parseInt(itemdata[1]));
                         }
                     } catch (NumberFormatException ex) {
                         is.setAmount(1);
@@ -190,10 +189,10 @@ public abstract class SignInRewardUtil
             config.getStringList(configPath).forEach((value) -> {
                 String[] args = value.split("-");
                 try {
-                    Sound sound = Sound.valueOf(args[0].toUpperCase());
-                    float volume = Float.valueOf(args[1]);
-                    float pitch = Float.valueOf(args[2]);
-                    boolean broadcast = Boolean.valueOf(args[3]);
+                    Sound sound = Registry.SOUNDS.get(NamespacedKey.minecraft(args[0].toLowerCase()));
+                    float volume = Float.parseFloat(args[1]);
+                    float pitch = Float.parseFloat(args[2]);
+                    boolean broadcast = Boolean.parseBoolean(args[3]);
                     sounds.add(new SignInSound(sound, volume, pitch, broadcast));
                 } catch (IllegalArgumentException ex) {
                     Map<String, String> placeholders = MessageUtil.getDefaultPlaceholders();
@@ -215,16 +214,11 @@ public abstract class SignInRewardUtil
             try {
                 String[] data = name.split(":");
                 boolean invalid = true;
-                for (Enchantment enchant : Enchantment.values()) {
-                    String enchantName;
-                    try {
-                        enchantName = enchant.getKey().getKey();
-                    } catch (Throwable ex) {
-                        enchantName = enchant.getName();
-                    }
+                for (Enchantment enchant : Registry.ENCHANTMENT) {
+                    String enchantName = enchant.getKey().getKey();
                     if (enchantName.equalsIgnoreCase(data[0])) {
                         try {
-                            im.addEnchant(enchant, Integer.valueOf(data[1]), true);
+                            im.addEnchant(enchant, Integer.parseInt(data[1]), true);
                             invalid = false;
                             break;
                         } catch (Exception ex) {

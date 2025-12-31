@@ -14,7 +14,7 @@ import studio.trc.bukkit.litesignin.database.engine.SQLiteEngine;
 import studio.trc.bukkit.litesignin.database.storage.MySQLStorage;
 import studio.trc.bukkit.litesignin.database.storage.SQLiteStorage;
 import studio.trc.bukkit.litesignin.database.storage.YamlStorage;
-import studio.trc.bukkit.litesignin.event.Menu;
+import studio.trc.bukkit.litesignin.event.MenuListener;
 import studio.trc.bukkit.litesignin.message.MessageUtil;
 import studio.trc.bukkit.litesignin.util.PluginControl;
 
@@ -65,7 +65,7 @@ public class RollBackUtil {
                     }
                     BackupUtil.startSyncBackup(rollBackUsers);
                 }
-                Bukkit.getOnlinePlayers().stream().filter(ps -> Menu.menuOpening.containsKey(ps.getUniqueId())).forEachOrdered(Player::closeInventory);
+                Bukkit.getOnlinePlayers().stream().filter(ps -> MenuListener.menuOpening.containsKey(ps.getUniqueId())).forEachOrdered(Player::closeInventory);
                 if (rollBackFile.exists()) {
                     rollingback = true;
                     try (Connection sqlConnection = DriverManager.getConnection("jdbc:sqlite:" + rollBackFile.getPath())) {
