@@ -1,4 +1,4 @@
-package studio.trc.bukkit.litesignin.event;
+package studio.trc.bukkit.litesignin.listeners;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;

@@ -31,12 +31,12 @@ public enum ConfigurationType {
     /**
      * GUISettings.yml
      */
-    GUI_SETTINGS("GUISettings.yml", "", new YamlConfiguration(), true, ConfigurationVersion.GUI_SETTINGS_V2, ConfigurationVersion.GUI_SETTINGS_V1),
+    GUI_SETTINGS("GUISettings.yml", "", new YamlConfiguration(), true, ConfigurationVersion.GUI_SETTINGS_V1),
 
     /**
      * RewardSettings.yml
      */
-    REWARD_SETTINGS("RewardSettings.yml", "", new YamlConfiguration(), false, ConfigurationVersion.REWARD_SETTINGS_V2, ConfigurationVersion.REWARD_SETTINGS_V1),
+    REWARD_SETTINGS("RewardSettings.yml", "", new YamlConfiguration(), false, ConfigurationVersion.REWARD_SETTINGS_V1),
 
     /**
      * CustomItems.yml

@@ -14,15 +14,15 @@ import studio.trc.bukkit.litesignin.database.engine.SQLiteEngine;
 import studio.trc.bukkit.litesignin.database.storage.MySQLStorage;
 import studio.trc.bukkit.litesignin.database.storage.SQLiteStorage;
 import studio.trc.bukkit.litesignin.database.util.BackupUtil;
-import studio.trc.bukkit.litesignin.event.PlayerListener;
-import studio.trc.bukkit.litesignin.event.MenuListener;
+import studio.trc.bukkit.litesignin.listeners.PlayerListener;
+import studio.trc.bukkit.litesignin.listeners.MenuListener;
 import studio.trc.bukkit.litesignin.message.MessageUtil;
 import studio.trc.bukkit.litesignin.thread.LiteSignInThread;
 import studio.trc.bukkit.litesignin.util.LiteSignInProperties;
 import studio.trc.bukkit.litesignin.util.PluginControl;
 import studio.trc.bukkit.litesignin.util.Updater;
 import studio.trc.bukkit.litesignin.util.metrics.Metrics;
-import studio.trc.bukkit.litesignin.util.woodsignscript.WoodSignEvent;
+import studio.trc.bukkit.litesignin.listeners.WoodSignListener;
 
 /**
  * Do not resell the source code of this plug-in.
@@ -111,8 +111,7 @@ public class Main
         PluginManager pm = Bukkit.getPluginManager();
         pm.registerEvents(new PlayerListener(), Main.getInstance());
         pm.registerEvents(new MenuListener(), Main.getInstance());
-        pm.registerEvents(new QuitListener(), Main.getInstance());
-        pm.registerEvents(new WoodSignEvent(), Main.getInstance());
+        pm.registerEvents(new WoodSignListener(), Main.getInstance());
         LiteSignInProperties.sendOperationMessage("PluginListenerRegistered");
     }
 

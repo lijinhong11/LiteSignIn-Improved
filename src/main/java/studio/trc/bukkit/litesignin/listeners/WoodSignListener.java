@@ -1,4 +1,4 @@
-package studio.trc.bukkit.litesignin.util.woodsignscript;
+package studio.trc.bukkit.litesignin.listeners;
 
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -16,10 +16,12 @@ import studio.trc.bukkit.litesignin.configuration.ConfigurationType;
 import studio.trc.bukkit.litesignin.configuration.ConfigurationUtil;
 import studio.trc.bukkit.litesignin.message.MessageUtil;
 import studio.trc.bukkit.litesignin.util.PluginControl;
+import studio.trc.bukkit.litesignin.util.woodsignscript.WoodSign;
+import studio.trc.bukkit.litesignin.util.woodsignscript.WoodSignUtil;
 
 import java.util.Map;
 
-public class WoodSignEvent
+public class WoodSignListener
         implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void click(PlayerInteractEvent event) {
