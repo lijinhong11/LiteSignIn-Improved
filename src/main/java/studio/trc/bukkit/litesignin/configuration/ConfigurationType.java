@@ -26,27 +26,27 @@ public enum ConfigurationType {
     /**
      * Messages.yml
      */
-    MESSAGES("Messages.yml", "", new YamlConfiguration(), true),
+    MESSAGES("Messages.yml", "", true),
 
     /**
      * GUISettings.yml
      */
-    GUI_SETTINGS("GUISettings.yml", "", new YamlConfiguration(), true, ConfigurationVersion.GUI_SETTINGS_V1),
+    GUI_SETTINGS("GUISettings.yml", "", true, ConfigurationVersion.GUI_SETTINGS_V1),
 
     /**
      * RewardSettings.yml
      */
-    REWARD_SETTINGS("RewardSettings.yml", "", new YamlConfiguration(), false, ConfigurationVersion.REWARD_SETTINGS_V1),
+    REWARD_SETTINGS("RewardSettings.yml", "", false, ConfigurationVersion.REWARD_SETTINGS_V1),
 
     /**
      * CustomItems.yml
      */
-    CUSTOM_ITEMS("CustomItems.yml", "", new YamlConfiguration(), false),
+    CUSTOM_ITEMS("CustomItems.yml", "", false),
 
     /**
      * WoodSignSettings.yml
      */
-    WOOD_SIGN_SETTINGS("WoodSignSettings.yml", "", new YamlConfiguration(), false);
+    WOOD_SIGN_SETTINGS("WoodSignSettings.yml", "", false);
 
     @Getter
     private final boolean universal;
@@ -59,11 +59,11 @@ public enum ConfigurationType {
     @Getter
     private final ConfigurationVersion[] versions;
 
-    ConfigurationType(String fileName, String folder, YamlConfiguration config, boolean universal, ConfigurationVersion... versions) {
+    ConfigurationType(String fileName, String folder, boolean universal, ConfigurationVersion... versions) {
         this.fileName = fileName;
         this.folder = folder;
         this.universal = universal;
-        this.config = config;
+        this.config = new YamlConfiguration();
         this.versions = versions;
     }
 

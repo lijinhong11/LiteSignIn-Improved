@@ -3,23 +3,7 @@ package studio.trc.bukkit.litesignin.configuration;
 import lombok.Getter;
 
 public enum ConfigurationVersion {
-    GUI_SETTINGS_V2(ConfigurationType.GUI_SETTINGS, null, "GUISettings-OLDVERSION.yml",
-            VersionType.V1_7_R1, VersionType.V1_7_R2, VersionType.V1_7_R3, VersionType.V1_7_R4,
-            VersionType.V1_8_R1, VersionType.V1_8_R2, VersionType.V1_8_R3,
-            VersionType.V1_9_R1, VersionType.V1_9_R2,
-            VersionType.V1_10_R1,
-            VersionType.V1_11_R1,
-            VersionType.V1_12_R1),
-
     GUI_SETTINGS_V1(ConfigurationType.GUI_SETTINGS, null, "GUISettings-NEWVERSION.yml"),
-
-    REWARD_SETTINGS_V2(ConfigurationType.REWARD_SETTINGS, null, "RewardSettings-OLDVERSION.yml",
-            VersionType.V1_7_R1, VersionType.V1_7_R2, VersionType.V1_7_R3, VersionType.V1_7_R4,
-            VersionType.V1_8_R1, VersionType.V1_8_R2, VersionType.V1_8_R3,
-            VersionType.V1_9_R1, VersionType.V1_9_R2,
-            VersionType.V1_10_R1,
-            VersionType.V1_11_R1,
-            VersionType.V1_12_R1),
 
     REWARD_SETTINGS_V1(ConfigurationType.REWARD_SETTINGS, null, "RewardSettings-NEWVERSION.yml");
 

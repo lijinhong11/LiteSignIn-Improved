@@ -19,7 +19,7 @@ import java.util.Map;
  *
  * @author Dean
  */
-public class RobustConfiguration {
+public class RobustConfiguration extends YamlConfiguration {
     @Getter
     private final ConfigurationType type;
     @Getter
@@ -47,10 +47,8 @@ public class RobustConfiguration {
     public int getInt(String path) {
         if (config.get(path) == null) {
             repairConfigurationSection(path);
-            return config.getInt(path);
-        } else {
-            return config.getInt(path);
         }
+        return config.getInt(path);
     }
 
     public int getInt(String path, int def) {
@@ -60,10 +58,8 @@ public class RobustConfiguration {
     public double getDouble(String path) {
         if (config.get(path) == null) {
             repairConfigurationSection(path);
-            return config.getDouble(path);
-        } else {
-            return config.getDouble(path);
         }
+        return config.getDouble(path);
     }
 
     public double getDouble(String path, double def) {
@@ -73,10 +69,8 @@ public class RobustConfiguration {
     public long getLong(String path) {
         if (config.get(path) == null) {
             repairConfigurationSection(path);
-            return config.getLong(path);
-        } else {
-            return config.getLong(path);
         }
+        return config.getLong(path);
     }
 
     public long getLong(String path, long def) {
@@ -86,10 +80,8 @@ public class RobustConfiguration {
     public boolean getBoolean(String path) {
         if (config.get(path) == null) {
             repairConfigurationSection(path);
-            return config.getBoolean(path);
-        } else {
-            return config.getBoolean(path);
         }
+        return config.getBoolean(path);
     }
 
     public boolean getBoolean(String path, boolean def) {
@@ -99,10 +91,8 @@ public class RobustConfiguration {
     public String getString(String path) {
         if (config.get(path) == null) {
             repairConfigurationSection(path);
-            return config.getString(path);
-        } else {
-            return config.getString(path);
         }
+        return config.getString(path);
     }
 
     public String getString(String path, String def) {
