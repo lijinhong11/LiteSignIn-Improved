@@ -44,7 +44,7 @@ public class GUICommand
                                 MessageUtil.sendMessage(sender, ConfigurationUtil.getConfig(ConfigurationType.MESSAGES), "GUI-SignIn-Messages.Minimum-GUI-Date", placeholders);
                                 return;
                             }
-                            MenuListener.openGUI(player, month);
+                            MenuListener.openGUI(player, target.getDay(), month);
                             placeholders.put("{month}", String.valueOf(month));
                             MessageUtil.sendCommandMessage(player, "GUI.Normal", placeholders);
                             return;
@@ -70,7 +70,7 @@ public class GUICommand
                     }
                     int year;
                     try {
-                        year = Integer.valueOf(args[2]);
+                        year = Integer.parseInt(args[2]);
                     } catch (NumberFormatException ex) {
                         placeholders.put("{year}", args[2]);
                         MessageUtil.sendCommandMessage(player, "GUI.Invalid-Year", placeholders);
@@ -89,7 +89,7 @@ public class GUICommand
                         MessageUtil.sendMessage(sender, ConfigurationUtil.getConfig(ConfigurationType.MESSAGES), "GUI-SignIn-Messages.Minimum-GUI-Date", placeholders);
                         return;
                     }
-                    MenuListener.openGUI(player, month, year);
+                    MenuListener.openGUI(player, 1, month, year);
                     placeholders.put("{month}", String.valueOf(month));
                     placeholders.put("{year}", String.valueOf(year));
                     MessageUtil.sendCommandMessage(player, "GUI.Specified-Year", placeholders);

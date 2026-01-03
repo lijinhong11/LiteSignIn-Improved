@@ -1,5 +1,6 @@
 package studio.trc.bukkit.litesignin.util;
 
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -18,11 +19,47 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+@Deprecated
 public class Updater {
+    /**
+     * -- GETTER --
+     *  Return whether found a new version.
+     *
+     * @return
+     */
+    @Getter
     private static boolean foundANewVersion = false;
+    /**
+     * -- GETTER --
+     *  Get new version.
+     *
+     * @return
+     */
+    @Getter
     private static String newVersion;
+    /**
+     * -- GETTER --
+     *  Get download link.
+     *
+     * @return
+     */
+    @Getter
     private static String link;
+    /**
+     * -- GETTER --
+     *  Get new version's update description.
+     *
+     * @return
+     */
+    @Getter
     private static String description;
+    /**
+     * -- GETTER --
+     *  Get extra messages.
+     *
+     * @return
+     */
+    @Getter
     private static List<String> extraMessages;
     private static Date date = new Date();
     private static final Runnable checkUpdate = () -> {
@@ -82,56 +119,11 @@ public class Updater {
     }
 
     /**
-     * Return whether found a new version.
-     *
-     * @return
-     */
-    public static boolean isFoundANewVersion() {
-        return foundANewVersion;
-    }
-
-    /**
-     * Get new version.
-     *
-     * @return
-     */
-    public static String getNewVersion() {
-        return newVersion;
-    }
-
-    /**
-     * Get download link.
-     *
-     * @return
-     */
-    public static String getLink() {
-        return link;
-    }
-
-    /**
-     * Get new version's update description.
-     *
-     * @return
-     */
-    public static String getDescription() {
-        return description;
-    }
-
-    /**
      * Get the time of last check update.
      *
      * @return
      */
     public static Date getTimeOfLastCheckUpdate() {
         return date;
-    }
-
-    /**
-     * Get extra messages.
-     *
-     * @return
-     */
-    public static List<String> getExtraMessages() {
-        return extraMessages;
     }
 }

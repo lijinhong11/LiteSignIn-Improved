@@ -9,6 +9,7 @@ import studio.trc.bukkit.litesignin.message.MessageUtil;
 import studio.trc.bukkit.litesignin.util.LiteSignInProperties;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -21,47 +22,44 @@ public enum ConfigurationType {
     /**
      * Config.yml
      */
-    CONFIG("Config.yml", "", new YamlConfiguration(), false),
+    CONFIG("Config.yml", false),
 
     /**
      * Messages.yml
      */
-    MESSAGES("Messages.yml", "", true),
+    MESSAGES("Messages.yml", true),
 
     /**
      * GUISettings.yml
      */
-    GUI_SETTINGS("GUISettings.yml", "", true, ConfigurationVersion.GUI_SETTINGS_V1),
+    GUI_SETTINGS("GUISettings.yml", true, ConfigurationVersion.GUI_SETTINGS_V1),
 
     /**
      * RewardSettings.yml
      */
-    REWARD_SETTINGS("RewardSettings.yml", "", false, ConfigurationVersion.REWARD_SETTINGS_V1),
+    REWARD_SETTINGS("RewardSettings.yml", false, ConfigurationVersion.REWARD_SETTINGS_V1),
 
     /**
      * CustomItems.yml
      */
-    CUSTOM_ITEMS("CustomItems.yml", "", false),
+    CUSTOM_ITEMS("CustomItems.yml", false),
 
     /**
      * WoodSignSettings.yml
      */
-    WOOD_SIGN_SETTINGS("WoodSignSettings.yml", "", false);
+    WOOD_SIGN_SETTINGS("WoodSignSettings.yml", false);
 
     @Getter
     private final boolean universal;
     @Getter
     private final String fileName;
     @Getter
-    private final String folder;
-    @Getter
     private final YamlConfiguration config;
     @Getter
     private final ConfigurationVersion[] versions;
 
-    ConfigurationType(String fileName, String folder, boolean universal, ConfigurationVersion... versions) {
+    ConfigurationType(String fileName, boolean universal, ConfigurationVersion... versions) {
         this.fileName = fileName;
-        this.folder = folder;
         this.universal = universal;
         this.config = new YamlConfiguration();
         this.versions = versions;
@@ -70,16 +68,16 @@ public enum ConfigurationType {
     public static void saveLanguageConfig(ConfigurationType type) {
         String language = MessageUtil.getLanguage();
         if (!type.getRobustConfig().getConfig().contains(language)) {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(Main.class.getResourceAsStream("/Languages/Universal/" + type.getLocalFilePath()), LiteSignInProperties.getMessage("Charset")))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(Main.class.getResourceAsStream("/Languages/Universal/" + type.getLocalFilePath()), StandardCharsets.UTF_8))) {
                 String line;
                 StringBuilder source = new StringBuilder();
-                try (BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream("plugins/LiteSignIn/" + type.getFolder() + type.getFileName()), LiteSignInProperties.getMessage("Charset")))) {
+                try (BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream("plugins/LiteSignIn/" + type.getFileName()), StandardCharsets.UTF_8))) {
                     while ((line = input.readLine()) != null) {
                         source.append(line);
                         source.append('\n');
                     }
                 }
-                try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("plugins/LiteSignIn/" + type.getFolder() + type.getFileName()), LiteSignInProperties.getMessage("Charset")))) {
+                try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("plugins/LiteSignIn/" + type.getFileName()), StandardCharsets.UTF_8))) {
                     writer.append(source.toString());
                     boolean keepWriting = false;
                     while ((line = reader.readLine()) != null) {
@@ -95,40 +93,25 @@ public enum ConfigurationType {
                         }
                     }
                 }
-                try (Reader reloader = new InputStreamReader(new FileInputStream("plugins/LiteSignIn/" + type.getFolder() + type.getFileName()), LiteSignInProperties.getMessage("Charset"))) {
+                try (Reader reloader = new InputStreamReader(new FileInputStream("plugins/LiteSignIn/" + type.getFileName()), StandardCharsets.UTF_8)) {
                     type.config.load(reloader);
                 } catch (IOException | InvalidConfigurationException ex) {
                     ex.printStackTrace();
                     Map<String, String> placeholders = MessageUtil.getDefaultPlaceholders();
-                    placeholders.put("{file}", type.getFolder() + type.getFileName());
+                    placeholders.put("{file}", type.getFileName());
                     LiteSignInProperties.sendOperationMessage("ConfigurationLoadingError", placeholders);
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
                 Map<String, String> placeholders = MessageUtil.getDefaultPlaceholders();
-                placeholders.put("{file}", type.getFolder() + type.getFileName());
+                placeholders.put("{file}", type.getFileName());
                 LiteSignInProperties.sendOperationMessage("ConfigurationLoadingError", placeholders);
             }
         }
     }
 
-    public static ConfigurationType getType(String filePath) {
-        String[] path = filePath.split("/", -1);
-        if (path.length > 1) {
-            String fileName = path[path.length - 1];
-            StringBuilder folder = new StringBuilder();
-            for (int i = 0; i < path.length - 1; i++) {
-                folder.append(path[i]);
-                folder.append("/");
-            }
-            return Arrays.stream(ConfigurationType.values()).filter(type -> type.getFolder().equalsIgnoreCase(folder.toString()) && type.getFileName().equalsIgnoreCase(fileName)).findFirst().orElse(null);
-        } else {
-            return Arrays.stream(ConfigurationType.values()).filter(type -> type.getFileName().equalsIgnoreCase(filePath)).findFirst().orElse(null);
-        }
-    }
-
     public void saveResource() {
-        File dataFolder = new File("plugins/LiteSignIn/" + folder);
+        File dataFolder = new File("plugins/LiteSignIn/");
         if (!dataFolder.exists()) {
             dataFolder.mkdirs();
         }
@@ -137,7 +120,7 @@ public enum ConfigurationType {
             if (!configFile.exists()) {
                 configFile.createNewFile();
                 if (!universal) {
-                    InputStream is = Main.class.getResourceAsStream("/Languages/" + (universal ? "Universal" : "") + MessageUtil.Language.getLocaleLanguage().getFolderName() + "/" + getLocalFilePath());
+                    InputStream is = Main.class.getResourceAsStream("/Languages/" + MessageUtil.Language.getLocaleLanguage().getFolderName() + "/" + getLocalFilePath());
                     byte[] bytes = new byte[is.available()];
                     for (int len = 0; len != bytes.length; len += is.read(bytes, len, bytes.length - len)) ;
                     try (OutputStream out = new FileOutputStream(configFile)) {
@@ -152,30 +135,30 @@ public enum ConfigurationType {
 
     public void saveConfig() {
         try {
-            config.save("plugins/LiteSignIn/" + folder + fileName);
+            config.save("plugins/LiteSignIn/" + fileName);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
     public void reloadConfig() {
-        try (InputStreamReader configFile = new InputStreamReader(new FileInputStream("plugins/LiteSignIn/" + folder + fileName), LiteSignInProperties.getMessage("Charset"))) {
+        try (InputStreamReader configFile = new InputStreamReader(new FileInputStream("plugins/LiteSignIn/" + fileName), StandardCharsets.UTF_8)) {
             config.load(configFile);
             if (universal) {
                 saveLanguageConfig(this);
             }
         } catch (IOException | InvalidConfigurationException ex) {
-            File oldFile = new File("plugins/LiteSignIn/" + folder + fileName + ".old");
-            File file = new File("plugins/LiteSignIn/" + folder + fileName);
+            File oldFile = new File("plugins/LiteSignIn/" + fileName + ".old");
+            File file = new File("plugins/LiteSignIn/" + fileName);
             Map<String, String> placeholders = MessageUtil.getDefaultPlaceholders();
-            placeholders.put("{file}", folder + fileName);
+            placeholders.put("{file}", fileName);
             LiteSignInProperties.sendOperationMessage("ConfigurationLoadingError", placeholders);
             if (oldFile.exists()) {
                 oldFile.delete();
             }
             file.renameTo(oldFile);
             saveResource();
-            try (InputStreamReader newConfig = new InputStreamReader(new FileInputStream(file), LiteSignInProperties.getMessage("Charset"))) {
+            try (InputStreamReader newConfig = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)) {
                 config.load(newConfig);
                 LiteSignInProperties.sendOperationMessage("ConfigurationRepair", MessageUtil.getDefaultPlaceholders());
             } catch (IOException | InvalidConfigurationException ex1) {
@@ -186,7 +169,7 @@ public enum ConfigurationType {
 
     public String getLocalFilePath() {
         if (versions.length == 0) {
-            return folder + fileName;
+            return fileName;
         } else {
             try {
                 String nms = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];

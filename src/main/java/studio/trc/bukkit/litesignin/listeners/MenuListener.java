@@ -49,9 +49,9 @@ public class MenuListener implements Listener {
         }
     }
 
-    public static void openGUI(Player player, int month) {
+    public static void openGUI(Player player, int day, int month) {
         Runnable task = () -> {
-            SignInInventory inventory = SignInGUI.getGUI(player, month);
+            SignInInventory inventory = SignInGUI.getGUI(player, day, month);
             SignInGUIOpenEvent event = new SignInGUIOpenEvent(player, inventory, month);
             callEvent(event, player, inventory);
         };
@@ -62,9 +62,9 @@ public class MenuListener implements Listener {
         }
     }
 
-    public static void openGUI(Player player, int month, int year) {
+    public static void openGUI(Player player, int day, int month, int year) {
         Runnable task = () -> {
-            SignInInventory inventory = SignInGUI.getGUI(player, month, year);
+            SignInInventory inventory = SignInGUI.getGUI(player, day, month, year);
             SignInGUIOpenEvent event = new SignInGUIOpenEvent(player, inventory, month, year);
             callEvent(event, player, inventory);
         };

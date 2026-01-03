@@ -61,7 +61,7 @@ public class SignInGUI {
         return new SignInInventory(gui, columns);
     }
 
-    public static SignInInventory getGUI(Player player, int month) {
+    public static SignInInventory getGUI(Player player, int day, int month) {
         /*
          * Chest GUI
          */
@@ -91,13 +91,13 @@ public class SignInGUI {
         getKey(player, month).stream().peek(items -> gui.setItem(items.getKeyPostion(), items.getItemStack()))
                 .forEach(columns::add);
 
-        getOthers(player, month).stream().peek(items -> gui.setItem(items.getKeyPostion(), items.getItemStack()))
+        getOthers(player, day, month).stream().peek(items -> gui.setItem(items.getKeyPostion(), items.getItemStack()))
                 .forEach(columns::add);
 
         return new SignInInventory(gui, columns, month);
     }
 
-    public static SignInInventory getGUI(Player player, int month, int year) {
+    public static SignInInventory getGUI(Player player, int day, int month, int year) {
         /*
          * Chest GUI
          */
@@ -134,7 +134,7 @@ public class SignInGUI {
         getKey(player, month, year).stream().peek(items -> gui.setItem(items.getKeyPostion(), items.getItemStack()))
                 .forEach(columns::add);
 
-        getOthers(player, month, year).stream().peek(items -> gui.setItem(items.getKeyPostion(), items.getItemStack()))
+        getOthers(player, day, month, year).stream().peek(items -> gui.setItem(items.getKeyPostion(), items.getItemStack()))
                 .forEach(columns::add);
 
         return new SignInInventory(gui, columns, month, year);
@@ -177,10 +177,10 @@ public class SignInGUI {
                 ItemStack key;
                 KeyType keyType;
                 if (playerdata.alreadySignIn(historicalDate)) {
-                    key = createKeyItemWithPlaceholders(section, "Already-SignIn", i + 1, player, placeholders);
+                    key = createKeyItemWithPlaceholders(section, "Already-SignIn", historicalDate, player, placeholders);
                     keyType = KeyType.ALREADY_SIGNIN;
                 } else {
-                    key = createKeyItemWithPlaceholders(section, "Missed-SignIn", i + 1, player, placeholders);
+                    key = createKeyItemWithPlaceholders(section, "Missed-SignIn", historicalDate, player, placeholders);
                     keyType = KeyType.MISSED_SIGNIN;
                 }
                 items.add(key);
@@ -206,7 +206,8 @@ public class SignInGUI {
             for (int i = 0; i < days[month - 1]; i++) {
                 Map<String, String> placeholders = getPlaceholdersOfItemLore(i, continuous, queue, totalNumber, cards,
                         nextPageMonth, nextPageYear, previousPageMonth, previousPageYear, null);
-                ItemStack key = createKeyItemWithPlaceholders(section, "Comming-Soon", i + 1, player, placeholders);
+                SignInDate date = SignInDate.getInstance(year, month, i + 1);
+                ItemStack key = createKeyItemWithPlaceholders(section, "Comming-Soon", date, player, placeholders);
                 items.add(key);
                 keys.add(KeyType.COMMING_SOON);
             }
@@ -284,24 +285,24 @@ public class SignInGUI {
             if (i + 1 < day) {
                 // Past dates
                 if (playerdata.alreadySignIn(historicalDate)) {
-                    key = createKeyItemWithPlaceholders(section, "Already-SignIn", i + 1, player, placeholders);
+                    key = createKeyItemWithPlaceholders(section, "Already-SignIn", historicalDate, player, placeholders);
                     keyType = KeyType.ALREADY_SIGNIN;
                 } else {
-                    key = createKeyItemWithPlaceholders(section, "Missed-SignIn", i + 1, player, placeholders);
+                    key = createKeyItemWithPlaceholders(section, "Missed-SignIn", historicalDate, player, placeholders);
                     keyType = KeyType.MISSED_SIGNIN;
                 }
             } else if (i + 1 == day) {
                 // Today
                 if (playerdata.alreadySignIn(historicalDate)) {
-                    key = createKeyItemWithPlaceholders(section, "Already-SignIn", i + 1, player, placeholders);
+                    key = createKeyItemWithPlaceholders(section, "Already-SignIn", historicalDate, player, placeholders);
                     keyType = KeyType.ALREADY_SIGNIN;
                 } else {
-                    key = createKeyItemWithPlaceholders(section, "Nothing-SignIn", i + 1, player, placeholders);
+                    key = createKeyItemWithPlaceholders(section, "Nothing-SignIn", historicalDate, player, placeholders);
                     keyType = KeyType.NOTHING_SIGNIN;
                 }
             } else {
                 // Future dates
-                key = createKeyItemWithPlaceholders(section, "Comming-Soon", i + 1, player, placeholders);
+                key = createKeyItemWithPlaceholders(section, "Comming-Soon", historicalDate, player, placeholders);
                 keyType = KeyType.COMMING_SOON;
             }
 
@@ -332,15 +333,15 @@ public class SignInGUI {
      */
     public static Set<SignInGUIColumn> getOthers(Player player) {
         SignInDate today = SignInDate.getInstance(new Date());
-        return getOthers(player, today.getMonth(), today.getYear());
+        return getOthers(player, today.getDay(), today.getMonth(), today.getYear());
     }
 
-    public static Set<SignInGUIColumn> getOthers(Player player, int month) {
+    public static Set<SignInGUIColumn> getOthers(Player player, int day, int month) {
         SignInDate today = SignInDate.getInstance(new Date());
-        return getOthers(player, month, today.getYear());
+        return getOthers(player, day, month, today.getYear());
     }
 
-    public static Set<SignInGUIColumn> getOthers(Player player, int month, int year) {
+    public static Set<SignInGUIColumn> getOthers(Player player, int day, int month, int year) {
         Set<SignInGUIColumn> set = new HashSet<>();
         Storage playerdata = Storage.getPlayer(player);
         String queue = String.valueOf(SignInQueue.getInstance().getRank(playerdata.getUserUUID()));
@@ -358,11 +359,28 @@ public class SignInGUI {
             section.getKeys(false).forEach(items -> {
                 ItemStack other;
                 try {
-                    if (section.get(items + ".Data") != null) {
-                        other = new ItemStack(Material.valueOf(section.getString(items + ".Item").toUpperCase()), 1,
-                                (short) section.getInt(items + ".Data"));
+                    if (section.get(items + ".Uniitem-Override") != null) {
+                        String keyString = section.getString(items + ".Uniitem-Override", "").replaceAll("\\{day}", String.valueOf(day));
+                        ItemKey key = ItemKey.fromString(keyString);
+                        AllItemProvider provider = new AllItemProvider();
+                        ItemStack uniitem = provider.item(key);
+                        if (uniitem != null) {
+                            other = uniitem;
+                        } else {
+                            if (section.get(items + ".Data") != null) {
+                                other = new ItemStack(Material.valueOf(section.getString(items + ".Item", "").toUpperCase()),
+                                        day, (short) section.getInt(items + ".Data"));
+                            } else {
+                                other = new ItemStack(Material.valueOf(section.getString(items + ".Item", "").toUpperCase()), day);
+                            }
+                        }
                     } else {
-                        other = new ItemStack(Material.valueOf(section.getString(items + ".Item").toUpperCase()), 1);
+                        if (section.get(items + ".Data") != null) {
+                            other = new ItemStack(Material.valueOf(section.getString(items + ".Item", "").toUpperCase()),
+                                    day, (short) section.getInt(items + ".Data"));
+                        } else {
+                            other = new ItemStack(Material.valueOf(section.getString(items + ".Item", "").toUpperCase()), day);
+                        }
                     }
                 } catch (IllegalArgumentException ex) {
                     other = new ItemStack(Material.BARRIER);
@@ -380,6 +398,13 @@ public class SignInGUI {
                     setCustomModelData(
                             MessageUtil.getLanguage() + ".SignIn-GUI-Settings.Others." + items + ".Custom-Model-Data",
                             other);
+                }
+                if (section.get(items + ".Item-Model") != null) {
+                    setItemModel(
+                            MessageUtil.getLanguage() + ".SignIn-GUI-Settings.Others." + items + ".Custom-Model-Data",
+                            other,
+                            day
+                    );
                 }
                 ItemMeta im = other.getItemMeta();
                 if (section.get(items + ".Lore") != null) {
@@ -566,8 +591,11 @@ public class SignInGUI {
         String name = ConfigurationUtil.getConfig(ConfigurationType.GUI_SETTINGS).getString(configPath);
         if (im == null || name == null)
             return;
+
+        name = name.replaceAll("\\{day}", String.valueOf(day));
+
         try {
-            im.setItemModel(NamespacedKey.fromString(name.replaceAll("\\{day}", String.valueOf(day))));
+            im.setItemModel(NamespacedKey.fromString(name));
         } catch (Exception ex) {
             Map<String, String> placeholders = MessageUtil.getDefaultPlaceholders();
             placeholders.put("{data}", name);
@@ -605,8 +633,11 @@ public class SignInGUI {
     /**
      * Create an item stack for a key button based on configuration section.
      */
-    private static ItemStack createKeyItem(ConfigurationSection section, String sectionPath, int day, Player player) {
+    private static ItemStack createKeyItem(ConfigurationSection section, String sectionPath, SignInDate date, Player player) {
         ItemStack item;
+        int day = date.getDay();;
+        int month = date.getMonth();
+        int year = date.getYear();
         try {
             if (section.get(sectionPath + ".Uniitem-Override") != null) {
                 String keyString = section.getString(sectionPath + ".Uniitem-Override", "").replaceAll("\\{day}", String.valueOf(day));
@@ -688,8 +719,11 @@ public class SignInGUI {
 
             // Set display name
             if (section.get(sectionPath + ".Display-Name") != null) {
-                im.setDisplayName(ColorUtils.toColor(replace(player, section.getString(sectionPath + ".Display-Name"),
-                        "{day}", String.valueOf(day))));
+                String displayName = section.getString(sectionPath + ".Display-Name", "");
+                displayName = replace(player, displayName, "{year}", String.valueOf(year));
+                displayName = replace(player, displayName, "{month}", String.valueOf(month));
+                displayName = replace(player, displayName, "{day}", String.valueOf(day));
+                im.setDisplayName(ColorUtils.toColor(displayName));
             }
 
             item.setItemMeta(im);
@@ -702,8 +736,8 @@ public class SignInGUI {
      * Create a key item with placeholders for lore.
      */
     private static ItemStack createKeyItemWithPlaceholders(ConfigurationSection section, String sectionPath,
-            int day, Player player, Map<String, String> placeholders) {
-        ItemStack item = createKeyItem(section, sectionPath, day, player);
+            SignInDate date, Player player, Map<String, String> placeholders) {
+        ItemStack item = createKeyItem(section, sectionPath, date, player);
 
         // Update lore with placeholders
         ItemMeta im = item.getItemMeta();

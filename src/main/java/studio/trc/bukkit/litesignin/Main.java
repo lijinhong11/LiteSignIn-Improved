@@ -20,7 +20,6 @@ import studio.trc.bukkit.litesignin.message.MessageUtil;
 import studio.trc.bukkit.litesignin.thread.LiteSignInThread;
 import studio.trc.bukkit.litesignin.util.LiteSignInProperties;
 import studio.trc.bukkit.litesignin.util.PluginControl;
-import studio.trc.bukkit.litesignin.util.Updater;
 import studio.trc.bukkit.litesignin.util.metrics.Metrics;
 import studio.trc.bukkit.litesignin.listeners.WoodSignListener;
 
@@ -59,9 +58,9 @@ public class Main
 
         //It will run after the server is started.
         PluginControl.runBukkitTask(() -> {
-            if (PluginControl.enableUpdater()) {
-                Updater.checkUpdate();
-            }
+            //if (PluginControl.enableUpdater()) {
+            //   Updater.checkUpdate();
+            //}
             if (!MessageUtil.useAdventure()) {
                 try {
                     if (Integer.parseInt(Bukkit.getBukkitVersion().split("\\.")[1]) > 19) {

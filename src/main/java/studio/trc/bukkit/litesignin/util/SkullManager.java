@@ -19,6 +19,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
@@ -38,7 +39,7 @@ public class SkullManager {
         try {
             URL url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString());
             String line;
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), LiteSignInProperties.getMessage("Charset")))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8))) {
                 while ((line = reader.readLine()) != null) {
                     source.append(line);
                     source.append('\n');
